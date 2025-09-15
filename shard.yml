@@ -1,0 +1,17 @@
+name: wool
+version: 0.1.0
+
+authors:
+  - mentalblood0 <necheporenko.stepan@yandex.ru>
+
+dependencies:
+  xxhash128:
+    github: mentalblood0/xxhash128
+  trove:
+    github: mentalblood0/trove
+  dream:
+    github: mentalblood0/dream
+
+crystal: '>= 1.16.3'
+
+license: MIT
