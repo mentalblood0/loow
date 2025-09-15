@@ -16,4 +16,4 @@ Theses and relations storage
 
 ## Usage
 
-See [spec/trove_spec.cr](./spec/wool_spec.cr)
+See [spec/wool_spec.cr](./spec/wool_spec.cr)

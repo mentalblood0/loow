@@ -68,7 +68,7 @@ module Wool
     NegationOf      = 1
     VersionOf       = 2
     ClarificationOf = 3
-    CosequenceOf    = 4
+    ConsequenceOf   = 4
     PartOf          = 5
   end
 
