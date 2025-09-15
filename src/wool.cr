@@ -96,7 +96,7 @@ module Wool
 
     def add(id : Id, tags : Array(String))
       chest.transaction do |tx|
-        chest.set id.to_oid, "tags", JSON::Any.new tags.map { |t| JSON::Any.new t }
+        tx.set id.to_oid, "tags", JSON::Any.new tags.map { |t| JSON::Any.new t }
         index.add id.to_bytes, tags
       end
     end

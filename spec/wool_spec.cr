@@ -14,7 +14,8 @@ describe Wool do
     id1 = sweater.add c1
     tags1 = Array.new 3 { rnd.hex 16 }
     sweater.add id1, tags1
-    (sweater.get id1).should eq({tags: tags1, content: c1})
+    sweater.add id1, ["lalala"]
+    (sweater.get id1).should eq({tags: tags1 + ["lalala"], content: c1})
 
     id2 = sweater.add c2
     (sweater.get id2).should eq({tags: nil, content: c2})
