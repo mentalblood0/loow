@@ -8,20 +8,29 @@ describe Wool do
   sweater = Wool::Sweater.from_yaml File.read "spec/config.yml"
 
   it "generative" do
-    tt = {} of Wool::Id => {content: Wool::Content, tags: Set(String)}
+    tt = {} of Wool::Id => Wool::Thesis
     100.times do
       case rnd.rand 0..2
       when 0
         c = rnd.hex 16
         id = sweater.add c
-        tt[id] = {content: c,
-                  tags:    Set(String).new}
+        tt[id] = {content:   c,
+                  relations: {from: Set(Wool::Id).new,
+                              to: Set(Wool::Id).new},
+                  tags: Set(String).new}
       when 1
-        c = {from: (tt.sample rnd rescue next)[0],
-             to:   (tt.sample rnd rescue next)[0],
+        from = (tt.sample rnd rescue next)[0]
+        to = (tt.sample rnd)[0]
+        c = {from: from,
+             to:   to,
              type: Wool::Type.values.sample rnd}
         id = sweater.add c
-        tt[id] = {content: c, tags: Set(String).new}
+        tt[id] = {content:   c,
+                  relations: {from: Set(Wool::Id).new,
+                              to: Set(Wool::Id).new},
+                  tags: Set(String).new}
+        tt[from][:relations][:from] << id
+        tt[to][:relations][:to] << id
       when 2
         id = (tt.sample rnd rescue next)[0]
         tags = Array.new (rnd.rand 1..8) { rnd.hex 1 }

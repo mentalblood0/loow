@@ -72,8 +72,9 @@ module Wool
     PartOf          = 5
   end
 
-  alias Relation = NamedTuple(from: Id, to: Id, type: Type)
+  alias Relation = {from: Id, to: Id, type: Type}
   alias Content = String | Relation
+  alias Thesis = {content: Content, relations: {from: Set(Id), to: Set(Id)}, tags: Set(String)}
 
   class Sweater
     include YAML::Serializable
@@ -97,9 +98,11 @@ module Wool
       index.add id.to_bytes, tags
     end
 
-    def get(id : Id)
-      {content: (Content.from_json (chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
-       tags:    Set.new index.get id.to_bytes}
+    def get(id : Id) : Thesis?
+      {content:   (Content.from_json (chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
+       relations: {from: (Set.new (chest.where "content.from", id.to_string).map { |oid| Id.from_oid oid }),
+                   to: (Set.new (chest.where "content.to", id.to_string).map { |oid| Id.from_oid oid })},
+       tags: Set.new index.get id.to_bytes}
     end
 
     def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
