@@ -74,7 +74,6 @@ module Wool
 
   alias Relation = NamedTuple(from: Id, to: Id, type: Type)
   alias Content = String | Relation
-  alias Thesis = NamedTuple(tags: Array(String)?, content: Content)
 
   class Sweater
     include YAML::Serializable
@@ -95,14 +94,12 @@ module Wool
     end
 
     def add(id : Id, tags : Array(String))
-      chest.transaction do |tx|
-        tx.set id.to_oid, "tags", JSON::Any.new tags.map { |t| JSON::Any.new t }
-        index.add id.to_bytes, tags
-      end
+      index.add id.to_bytes, tags
     end
 
     def get(id : Id)
-      Thesis.from_json (chest.get id.to_oid).to_json
+      {content: (Content.from_json (chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
+       tags:    index.get id.to_bytes}
     end
   end
 end

@@ -18,10 +18,10 @@ describe Wool do
     (sweater.get id1).should eq({tags: tags1 + ["lalala"], content: c1})
 
     id2 = sweater.add c2
-    (sweater.get id2).should eq({tags: nil, content: c2})
+    (sweater.get id2).should eq({tags: [] of String, content: c2})
 
     rel = {from: id1, to: id2, type: Wool::Type::AnswerTo}
     idr1 = sweater.add rel
-    (sweater.get idr1).should eq({tags: nil, content: rel})
+    (sweater.get idr1).should eq({tags: [] of String, content: rel})
   end
 end
