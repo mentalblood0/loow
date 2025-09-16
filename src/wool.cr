@@ -37,9 +37,10 @@ module Wool
     end
 
     def self.from_oid(oid : Trove::Oid)
-      oid0 = oid[0]
-      oid1 = oid[1]
-      new (pointerof(oid0).as(UInt8*).to_slice(8) + pointerof(oid1).as(UInt8*).to_slice(8)).hexstring
+      r = Bytes.new 16
+      IO::ByteFormat::BigEndian.encode oid[0], r[0..7]
+      IO::ByteFormat::BigEndian.encode oid[1], r[8..15]
+      new r.hexstring
     end
 
     def self.from_bytes(b : Bytes)
