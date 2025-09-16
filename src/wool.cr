@@ -99,7 +99,11 @@ module Wool
 
     def get(id : Id)
       {content: (Content.from_json (chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
-       tags:    index.get id.to_bytes}
+       tags:    Set.new index.get id.to_bytes}
+    end
+
+    def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
+      index.find present, absent, limit, (from ? from.to_bytes : nil)
     end
   end
 end
