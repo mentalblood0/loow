@@ -107,7 +107,7 @@ module Wool
     end
 
     def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
-      index.find present, absent, limit, (from ? from.to_bytes : nil)
+      (index.find present, absent, limit, (from ? from.to_bytes : nil)).map { |b| Id.from_bytes b }
     end
   end
 end
