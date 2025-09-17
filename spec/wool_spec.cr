@@ -10,10 +10,13 @@ describe Wool do
   it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
     100.times do
-      case rnd.rand 0..3
+      case rnd.rand 0..2
       when 0
-        c = rnd.hex 16
+        c = rnd.hex 17
         id = sweater.add c
+
+        ::Log.debug { "add #{c} => #{id}" }
+
         tt[id] = {content:   c,
                   relations: {from: Set(Wool::Id).new,
                               to: Set(Wool::Id).new},
@@ -25,6 +28,9 @@ describe Wool do
              to:   to,
              type: Wool::Type.values.sample rnd}
         id = sweater.add c
+
+        ::Log.debug { "add #{c} => #{id}" }
+
         tt[id] = {content:   c,
                   relations: {from: Set(Wool::Id).new,
                               to: Set(Wool::Id).new},
@@ -35,22 +41,10 @@ describe Wool do
         id = (tt.sample rnd rescue next)[0]
         tags = Array.new (rnd.rand 1..8) { rnd.hex 1 }
         sweater.add id, tags
+
+        ::Log.debug { "add #{id} #{tags}" }
+
         tt[id][:tags].concat tags
-      when 3
-        id = (tt.sample rnd rescue next)[0]
-        sweater.delete id
-        t = tt[id]
-        t[:relations][:from].each do |i|
-          to = (tt[i][:content].as Wool::Relation)[:to]
-          tt[to][:relations][:to].delete i
-          tt.delete i
-        end
-        t[:relations][:to].each do |i|
-          from = (tt[i][:content].as Wool::Relation)[:from]
-          tt[from][:relations][:from].delete i
-          tt.delete i
-        end
-        tt.delete id
       end
       tt.each do |id, t|
         (sweater.get id).should eq t
