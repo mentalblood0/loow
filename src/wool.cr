@@ -106,6 +106,14 @@ module Wool
        tags: Set.new index.get id.to_bytes}
     end
 
+    def delete(id : Id)
+      chest.transaction do |tx|
+        d = (chest.where "content.from", id.to_string) + (chest.where "content.to", id.to_string)
+        d.each { |oid| tx.delete oid }
+        d.each { |oid| index.delete (Id.from_oid oid).to_bytes }
+      end
+    end
+
     def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
       (index.find present, absent, limit, (from ? from.to_bytes : nil)).map { |b| Id.from_bytes b }
     end
