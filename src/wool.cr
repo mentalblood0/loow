@@ -111,10 +111,15 @@ module Wool
     end
 
     def delete(id : Id)
-      chest.transaction do |tx|
-        d = (chest.where "content.from", id.to_string) + (chest.where "content.to", id.to_string)
-        d.each { |oid| tx.delete oid }
-        d.each { |oid| index.delete (Id.from_oid oid).to_bytes }
+      chest.transaction do |ctx|
+        index.transaction do |itx|
+          ["content.from", "content.to"].each do |p|
+            chest.where p, id.to_string do |oid|
+              ctx.delete oid
+              itx.delete (Id.from_oid oid).to_bytes
+            end
+          end
+        end
       end
     end
 
