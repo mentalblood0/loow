@@ -1,6 +1,6 @@
 require "spec"
 
-require "../src/wool"
+require "../src/Command"
 
 rnd = Random.new 0
 
@@ -13,10 +13,7 @@ describe Wool do
       case rnd.rand 0..3
       when 0
         c = rnd.hex 17
-        id = sweater << Wool::Sweater::Command::Add.new({c: c})
-
-        ::Log.debug { "add #{c} => #{id}" }
-
+        id = Wool::Command::Add.new({c: c}).exec sweater
         tt[id] = {content:   c,
                   relations: {from: Set(Wool::Id).new,
                               to: Set(Wool::Id).new},
@@ -27,10 +24,7 @@ describe Wool do
         c = {from: from,
              to:   to,
              type: Wool::Type.values.sample rnd}
-        id = sweater << Wool::Sweater::Command::Add.new({c: c})
-
-        ::Log.debug { "add #{c} => #{id}" }
-
+        id = Wool::Command::Add.new({c: c}).exec sweater
         tt[id] = {content:   c,
                   relations: {from: Set(Wool::Id).new,
                               to: Set(Wool::Id).new},
@@ -40,22 +34,16 @@ describe Wool do
       when 2
         id = (tt.sample rnd rescue next)[0]
         tags = Array.new (rnd.rand 1..8) { rnd.hex 1 }
-        sweater << Wool::Sweater::Command::AddTags.new({id: id, tags: tags})
-
-        ::Log.debug { "add #{id} #{tags}" }
-
+        Wool::Command::AddTags.new({id: id, tags: tags}).exec sweater
         tt[id][:tags].concat tags
       when 3
         id = (tt.sample rnd rescue next)[0]
         tags = tt[id][:tags].sample (rnd.rand 1..8), rnd rescue next
-        sweater << Wool::Sweater::Command::DeleteTags.new({id: id, tags: tags})
-
-        ::Log.debug { "delete #{id} #{tags}" }
-
+        Wool::Command::DeleteTags.new({id: id, tags: tags}).exec sweater
         tt[id][:tags].subtract tags
       end
       tt.each do |id, t|
-        (sweater << Wool::Sweater::Command::Get.new({id: id})).should eq t
+        (Wool::Command::Get.new({id: id}).exec sweater).should eq t
       end
     end
   end
