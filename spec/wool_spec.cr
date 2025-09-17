@@ -10,7 +10,7 @@ describe Wool do
   it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
     100.times do
-      case rnd.rand 0..2
+      case rnd.rand 0..3
       when 0
         c = rnd.hex 17
         id = sweater.add c
@@ -45,6 +45,14 @@ describe Wool do
         ::Log.debug { "add #{id} #{tags}" }
 
         tt[id][:tags].concat tags
+      when 3
+        id = (tt.sample rnd rescue next)[0]
+        tags = tt[id][:tags].sample (rnd.rand 1..8), rnd rescue next
+        sweater.delete id, tags
+
+        ::Log.debug { "delete #{id} #{tags}" }
+
+        tt[id][:tags].subtract tags
       end
       tt.each do |id, t|
         (sweater.get id).should eq t

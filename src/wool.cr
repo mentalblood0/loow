@@ -99,6 +99,10 @@ module Wool
       index.add id.to_bytes, tags
     end
 
+    def delete(id : Id, tags : Array(String))
+      index.delete id.to_bytes, tags
+    end
+
     def get(id : Id) : Thesis?
       {content:   (Content.from_json (chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
        relations: {from: (Set.new (chest.where "content.from", id.to_string).map { |oid| Id.from_oid oid }),
