@@ -13,7 +13,7 @@ describe Wool do
       case rnd.rand 0..3
       when 0
         c = rnd.hex 17
-        id = sweater.add c
+        id = sweater << Wool::Sweater::Command::Add.new({c: c})
 
         ::Log.debug { "add #{c} => #{id}" }
 
@@ -27,7 +27,7 @@ describe Wool do
         c = {from: from,
              to:   to,
              type: Wool::Type.values.sample rnd}
-        id = sweater.add c
+        id = sweater << Wool::Sweater::Command::Add.new({c: c})
 
         ::Log.debug { "add #{c} => #{id}" }
 
@@ -40,7 +40,7 @@ describe Wool do
       when 2
         id = (tt.sample rnd rescue next)[0]
         tags = Array.new (rnd.rand 1..8) { rnd.hex 1 }
-        sweater.add id, tags
+        sweater << Wool::Sweater::Command::AddTags.new({id: id, tags: tags})
 
         ::Log.debug { "add #{id} #{tags}" }
 
@@ -48,14 +48,14 @@ describe Wool do
       when 3
         id = (tt.sample rnd rescue next)[0]
         tags = tt[id][:tags].sample (rnd.rand 1..8), rnd rescue next
-        sweater.delete id, tags
+        sweater << Wool::Sweater::Command::DeleteTags.new({id: id, tags: tags})
 
         ::Log.debug { "delete #{id} #{tags}" }
 
         tt[id][:tags].subtract tags
       end
       tt.each do |id, t|
-        (sweater.get id).should eq t
+        (sweater << Wool::Sweater::Command::Get.new({id: id})).should eq t
       end
     end
   end

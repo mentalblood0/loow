@@ -126,5 +126,93 @@ module Wool
     def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
       (index.find present, absent, limit, (from ? from.to_bytes : nil)).map { |b| Id.from_bytes b }
     end
+
+    class Command
+      include YAML::Serializable
+      include YAML::Serializable::Strict
+
+      getter action : String
+      use_yaml_discriminator "action", {add:         Add,
+                                        delete:      Delete,
+                                        add_tags:    AddTags,
+                                        delete_tags: DeleteTags,
+                                        get:         Get,
+                                        get_by_tags: GetByTags}
+
+      def initialize(@action)
+      end
+
+      class Add < Command
+        getter args : {c: Content}
+
+        def initialize(@args)
+          super("add")
+        end
+      end
+
+      class Delete < Command
+        getter args : {id: Id}
+
+        def initialize(@args)
+          super("delete")
+        end
+      end
+
+      class AddTags < Command
+        getter args : {id: Id, tags: Array(String)}
+
+        def initialize(@args)
+          super("add_tags")
+        end
+      end
+
+      class DeleteTags < Command
+        getter args : {id: Id, tags: Array(String)}
+
+        def initialize(@args)
+          super("delete_tags")
+        end
+      end
+
+      class Get < Command
+        getter args : {id: Id}
+
+        def initialize(@args)
+          super("get")
+        end
+      end
+
+      class GetIds < Command
+        getter args : {present: Array(String), absent: Array(String), limit: UInt32, from: Id?}
+
+        def initialize(@args)
+          super("get_by_tags")
+        end
+      end
+    end
+
+    def <<(c : Command::Add)
+      add **c.args
+    end
+
+    def <<(c : Command::Delete)
+      delete **c.args
+    end
+
+    def <<(c : Command::AddTags)
+      add **c.args
+    end
+
+    def <<(c : Command::DeleteTags)
+      delete **c.args
+    end
+
+    def <<(c : Command::Get)
+      get **c.args
+    end
+
+    def <<(c : Command::GetByTags)
+      get **c.args
+    end
   end
 end
