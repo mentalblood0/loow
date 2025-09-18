@@ -35,14 +35,14 @@ module Wool
         ids = id.to_string
         c = Content.from_json (@sweater.chest.get oid).not_nil!["content"].to_json
         t = @sweater.index.get id.to_bytes
-        tags = (t.size > 0) ? wrap (t.join ' '), 20 : nil
+        tags = (t.size > 0) ? wrap (t.join ' '), @wrap_width : nil
         case c
         when String
-          text = wrap c, 20
+          text = wrap c, @wrap_width
           label = tags ? "{#{text}|#{tags}}" : text
           io << "\n\t\"#{id.to_string}\" [label=\"#{label}\", shape=record];"
         when Relation
-          text = wrap (c[:type].to_s.underscore.gsub '_', ' '), 20
+          text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @wrap_width
           label = tags ? "{#{text}|#{tags}}" : text
           fids = c[:from].to_string
           tids = c[:to].to_string
