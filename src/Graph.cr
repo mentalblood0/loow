@@ -40,7 +40,7 @@ module Wool
         when String
           text = wrap c, @wrap_width
           label = tags ? "{#{text}|#{tags}}" : text
-          io << "\n\t\"#{id.to_string}\" [label=\"#{label}\", shape=record];"
+          io << "\n\t\"#{id.to_string}\" [label=\"#{label}\", shape=record, style=bold];"
         when Relation
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @wrap_width
           label = tags ? "{#{text}|#{tags}}" : text
@@ -50,7 +50,7 @@ module Wool
           io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
           io << "\n\t\"#{fids}\" -> \"#{iids}\" [arrowhead=none];"
           io << "\n\t\"#{iids}\" -> \"#{tids}\";"
-          io << "\n\t\"#{ids}\" [label=\"#{label}\", shape=record, style=rounded];"
+          io << "\n\t\"#{ids}\" [label=\"#{label}\", shape=record, style=dashed];"
           io << "\n\t\"#{iids}\" -> \"#{ids}\" [dir=none, style=dotted];"
         end
       end
