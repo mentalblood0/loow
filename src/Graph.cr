@@ -21,8 +21,8 @@ module Wool
           tid = c[:to].to_string
           iid = "#{fid} -> #{tid}"
           io << "\n\t\"#{iid}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
-          io << "\n\t\"#{fid}\" -> \"#{iid}\" [arrowhead=none, weight=3];"
-          io << "\n\t\"#{iid}\" -> \"#{tid}\" [weight=3];"
+          io << "\n\t\"#{fid}\" -> \"#{iid}\" [arrowhead=none];"
+          io << "\n\t\"#{iid}\" -> \"#{tid}\";"
           io << "\n\t\"#{id}\" [label=\"#{label}\", shape=ellipse];"
           io << "\n\t\"#{iid}\" -> \"#{id}\" [dir=none, style=dotted];"
         end
