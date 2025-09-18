@@ -7,6 +7,10 @@ module Wool
     protected def initialize(@value)
     end
 
+    def <=>(other : Id)
+      to_string <=> other.to_string
+    end
+
     def to_json(json : JSON::Builder)
       json.string @value
     end

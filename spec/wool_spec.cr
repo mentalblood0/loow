@@ -42,6 +42,7 @@ describe Wool do
         Wool::Command::DeleteTags.new({id: id, tags: tags}).exec sweater
         tt[id][:tags].subtract tags
       end
+      sweater.ids.sort.should eq tt.keys.sort
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
       end

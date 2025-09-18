@@ -69,6 +69,14 @@ module Wool
       end
     end
 
+    def ids(&)
+      chest.oids { |oid| yield Id.from_oid oid }
+    end
+
+    def ids
+      chest.oids.map { |oid| Id.from_oid oid }
+    end
+
     def get(present : Array(String), absent : Array(String) = [] of String, limit : UInt32 = UInt32::MAX, from : Id? = nil)
       (index.find present, absent, limit, (from ? from.to_bytes : nil)).map { |b| Id.from_bytes b }
     end
