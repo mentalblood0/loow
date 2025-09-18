@@ -52,7 +52,7 @@ describe Wool do
     end
 
     gio = IO::Memory.new
-    g = Wool::Graph.new sweater, wrap: 20
+    g = Wool::Graph.new sweater, wrap_width: 20
     g.write gio
     puts gio.to_s
   end

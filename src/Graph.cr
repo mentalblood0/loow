@@ -3,9 +3,9 @@ require "./Sweater"
 module Wool
   class Graph
     getter sweater : Sweater
-    getter wrap : UInt16
+    getter wrap_width : UInt16
 
-    def initialize(@sweater, @wrap)
+    def initialize(@sweater, @wrap_width)
     end
 
     protected def wrap(text : String, width : UInt16)
