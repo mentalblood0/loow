@@ -1,6 +1,7 @@
 require "spec"
 
 require "../src/Command"
+require "../src/Graph"
 
 rnd = Random.new 0
 
@@ -9,7 +10,8 @@ describe Wool do
 
   it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
-    100.times do
+    i = 0
+    until i == 100
       case rnd.rand 0..3
       when 0
         c = rnd.hex 17
@@ -46,6 +48,12 @@ describe Wool do
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
       end
+      i += 1
     end
+
+    gio = IO::Memory.new
+    g = Wool::Graph.new sweater
+    g.write gio
+    puts gio.to_s
   end
 end
