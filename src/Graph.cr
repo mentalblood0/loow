@@ -3,8 +3,9 @@ require "./Sweater"
 module Wool
   class Graph
     getter sweater : Sweater
+    getter wrap : UInt16
 
-    def initialize(@sweater)
+    def initialize(@sweater, @wrap)
     end
 
     protected def wrap(text : String, width : UInt16)
@@ -41,7 +42,7 @@ module Wool
           label = tags ? "{#{text}|#{tags}}" : text
           io << "\n\t\"#{id.to_string}\" [label=\"#{label}\", shape=record];"
         when Relation
-          text = c[:type].to_s.underscore.gsub '_', ' '
+          text = wrap (c[:type].to_s.underscore.gsub '_', ' '), 20
           label = tags ? "{#{text}|#{tags}}" : text
           fids = c[:from].to_string
           tids = c[:to].to_string
