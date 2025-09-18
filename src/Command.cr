@@ -7,89 +7,59 @@ module Wool
     include YAML::Serializable
     include YAML::Serializable::Strict
 
+    macro myd(d, *nn)
+      use_yaml_discriminator "{{d}}", {
+        {% for n in nn %}
+          {{n}}: {{n.stringify.camelcase.id}},
+        {% end %}
+      }
+    end
+
+    macro dc(n, a, b)
+      struct {{n.stringify.camelcase.id}} < Command
+        getter args : {{a}}
+
+        def initialize(@args)
+          super("{{n}}")
+        end
+
+        def exec(s : Sweater)
+          {{b}}
+        end
+      end
+    end
+
     getter action : String
-    use_yaml_discriminator "action", {add:         Add,
-                                      delete:      Delete,
-                                      add_tags:    AddTags,
-                                      delete_tags: DeleteTags,
-                                      get:         Get,
-                                      get_by_tags: GetByTags}
+
+    myd action, add, delete, add_tags, delete_tags, get, get_by_tags
 
     def initialize(@action)
     end
 
     abstract def exec(s : Sweater)
 
-    struct Add < Command
-      getter args : {c: Content}
-
-      def initialize(@args)
-        super("add")
-      end
-
-      def exec(s : Sweater)
-        s.add **@args
-      end
+    dc add, {c: Content}, begin
+      s.add **@args
     end
 
-    struct Delete < Command
-      getter args : {id: Id}
-
-      def initialize(@args)
-        super("delete")
-      end
-
-      def exec(s : Sweater)
-        s.delete **@args
-      end
+    dc delete, {id: Id}, begin
+      s.delete **@args
     end
 
-    struct AddTags < Command
-      getter args : {id: Id, tags: Array(String)}
-
-      def initialize(@args)
-        super("add_tags")
-      end
-
-      def exec(s : Sweater)
-        s.add **@args
-      end
+    dc add_tags, {id: Id, tags: Array(String)}, begin
+      s.add **@args
     end
 
-    struct DeleteTags < Command
-      getter args : {id: Id, tags: Array(String)}
-
-      def initialize(@args)
-        super("delete_tags")
-      end
-
-      def exec(s : Sweater)
-        s.delete **@args
-      end
+    dc delete_tags, {id: Id, tags: Array(String)}, begin
+      s.delete **@args
     end
 
-    struct Get < Command
-      getter args : {id: Id}
-
-      def initialize(@args)
-        super("get")
-      end
-
-      def exec(s : Sweater)
-        s.get **@args
-      end
+    dc get, {id: Id}, begin
+      s.get **@args
     end
 
-    struct GetIds < Command
-      getter args : {present: Array(String), absent: Array(String), limit: UInt32, from: Id?}
-
-      def initialize(@args)
-        super("get_by_tags")
-      end
-
-      def exec(s : Sweater)
-        s.get **@args
-      end
+    dc get_by_tags, {present: Array(String), absent: Array(String), limit: UInt32, from: Id?}, begin
+      s.get **@args
     end
   end
 end
