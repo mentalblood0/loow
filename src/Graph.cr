@@ -17,8 +17,14 @@ module Wool
           io << "\n\t\"#{id}\" [label=\"#{c}\", shape=box];"
         when Relation
           label = c[:type].to_s.underscore.gsub '_', ' '
+          fid = c[:from].to_string
+          tid = c[:to].to_string
+          iid = "#{fid} -> #{tid}"
+          io << "\n\t\"#{iid}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
+          io << "\n\t\"#{fid}\" -> \"#{iid}\" [arrowhead=none, weight=3];"
+          io << "\n\t\"#{iid}\" -> \"#{tid}\" [weight=3];"
           io << "\n\t\"#{id}\" [label=\"#{label}\", shape=ellipse];"
-          io << "\n\t\"#{c[:from].to_string}\" -> \"#{id}\" -> \"#{c[:to].to_string}\";"
+          io << "\n\t\"#{iid}\" -> \"#{id}\" [dir=none, style=dotted];"
         end
       end
       io << "\n}"
