@@ -51,9 +51,9 @@ describe Wool do
       i += 1
     end
 
-    gio = IO::Memory.new
-    g = Wool::Graph.new sweater, wrap_width: 20
-    g.write gio
-    puts gio.to_s
+    File.open "/tmp/sweater_graph.dot", "w" do |gio|
+      g = Wool::Graph.new sweater, wrap_width: 20
+      g.write gio
+    end
   end
 end
