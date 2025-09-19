@@ -3,37 +3,76 @@ elements:
     text: Релятивизм
   - id: R-r
     text: Полный релятивизм
-  - type: version_of
-    from: R-r
-    to: R
+  - type: may_be
+    from: R
+    to: R-r
   - id: R-a
     text: Неполный релятивизм
-  - type: version_of
-    from: R-a
-    to: R
+  - type: may_be
+    from: R
+    to: R-a
   - id: (R-r).d
     text: "Зависимость: истинность или ложность возможны только относительно перспективы"
-  - type: part_of
-    from: (R-r).d
-    to: R-r
+  - type: includes
+    from: R-r
+    to: (R-r).d
   - id: (R-r).p
     text: "Множественность: есть более одной перспективы"
-  - type: part_of
-    from: (R-r).p
-    to: R-r
+  - type: includes
+    from: R-r
+    to: (R-r).p
   - id: (R-r).nns
     text: "Не-нейтральная симметрия: выбор перспективы возможен только исходя из перспективы"
-  - type: part_of
-    from: (R-r).nns
-    to: R-r
+  - type: includes
+    from: R-r
+    to: (R-r).nns
   - id: EV
     text: "Одинаковая валидность: все перспективы одинаково правильные"
-  - id: "EV negation of (R-r).nns"
-    type: negation_of
+  - id: EV_negation_of_(R-r).nns
+    type: negates
     from: EV
     to: (R-r).nns
   - id: EV->1
     text: Существует конкретное ранжирование и нейтральная, абсолютная перспектива, исходя из которой это ранжирование возможно
-  - type: consequence_of
-    from: "EV negation of (R-r).nns"
+  - id: EV->1_consequence_of_EV
+    type: therefore
+    from: EV
     to: EV->1
+  - type: therefore
+    from: EV->1_consequence_of_EV
+    to: EV_negation_of_(R-r).nns
+  - id: (R-r).0 
+    text: Все истины относительны
+  - type: therefore
+    from: (R-r).d
+    to: (R-r).0
+  - id: A
+    text: Абсолютизм
+  - id: A1
+    text: Релятивизм либо противоречит себе, либо подрывает себя
+  - type: includes
+    from: A
+    to: A1
+  - id: (R-r).0_true_relatively
+    text: "'Все истины относительны' относительно истинно"
+  - type: may_be
+    from: (R-r).0
+    to: (R-r).0_true_relatively
+  - id: A1.1.1
+    text: Относительно абсолютиста релятивизм ложен
+  - type: therefore
+    from: (R-r).0_true_relatively
+    to: A1.1.1
+  - id: R-r_false_absolutely
+    text: Релятивизм абсолютно ложен
+  - type: therefore
+    from: A1.1.1
+    to: R-r_false_absolutely
+  - id: (R-r).0_true_absolutely
+    text: "'Все истины относительны' абсолютно истинно"
+  - type: may_be
+    from: (R-r).0
+    to: (R-r).0_true_absolutely
+  - type: therefore
+    from: (R-r).0_true_absolutely
+    to: A

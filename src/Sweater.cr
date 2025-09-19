@@ -11,12 +11,12 @@ module Wool
   end
 
   enum Type : UInt8
-    AnswerTo        = 0
-    NegationOf      = 1
-    VersionOf       = 2
-    ClarificationOf = 3
-    ConsequenceOf   = 4
-    PartOf          = 5
+    Answers   = 0
+    Negates   = 1
+    MayBe     = 2
+    Means     = 3
+    Therefore = 4
+    Includes  = 5
   end
 
   alias Relation = {from: Id, to: Id, type: Type}

@@ -30,7 +30,6 @@ module Wool
 
     def write(io : IO)
       io << "digraph sweater {"
-      io << "\n\trankdir=BT;"
       @sweater.chest.objects do |oid, o|
         id = Id.from_oid oid
         ids = id.to_string
