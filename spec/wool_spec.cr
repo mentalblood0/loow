@@ -6,7 +6,7 @@ require "../src/Graph"
 
 rnd = Random.new 0
 
-alias Config = {sweater: Wool::Sweater, graph: {dest: String}, conversion: {src: String}}
+alias Config = {sweater: Wool::Sweater, graph: {dest: String, config: Wool::Graph::Config}, conversion: {src: String}}
 
 describe Wool do
   config = Config.from_yaml File.read "spec/config.yml"
@@ -14,7 +14,7 @@ describe Wool do
 
   Spec.after_each do
     File.open config[:graph][:dest], "w" do |gio|
-      g = Wool::Graph.new sweater, wrap_width: 40
+      g = Wool::Graph.new sweater, config[:graph][:config]
       g.write gio
     end
   end
@@ -63,7 +63,7 @@ describe Wool do
     end
   end
 
-  it "convertion", focus: true do
+  it "conversion", focus: true do
     batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
     commands = batch.convert
     commands.each { |c| c.exec sweater }

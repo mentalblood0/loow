@@ -33,5 +33,8 @@ sweater:
             *ddbs
 graph:
   dest: /tmp/sweater_graph.dot
+  config:
+    wrap_width: 40
+    externalize_relations_nodes: none
 conversion:
   src: spec/batch.yml
