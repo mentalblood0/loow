@@ -3,37 +3,37 @@ elements:
     text: Релятивизм
   - id: R-r
     text: Полный релятивизм
-  - from: R-r
+  - type: version_of
+    from: R-r
     to: R
-    type: version_of
   - id: R-a
     text: Неполный релятивизм
-  - from: R-a
+  - type: version_of
+    from: R-a
     to: R
-    type: version_of
   - id: (R-r).d
     text: "Зависимость: истинность или ложность возможны только относительно перспективы"
-  - from: (R-r).d
+  - type: part_of
+    from: (R-r).d
     to: R-r
-    type: part_of
   - id: (R-r).p
     text: "Множественность: есть более одной перспективы"
-  - from: (R-r).p
+  - type: part_of
+    from: (R-r).p
     to: R-r
-    type: part_of
   - id: (R-r).nns
     text: "Не-нейтральная симметрия: выбор перспективы возможен только исходя из перспективы"
-  - from: (R-r).nns
+  - type: part_of
+    from: (R-r).nns
     to: R-r
-    type: part_of
   - id: EV
     text: "Одинаковая валидность: все перспективы одинаково правильные"
   - id: "EV negation of (R-r).nns"
+    type: negation_of
     from: EV
     to: (R-r).nns
-    type: negation_of
   - id: EV->1
     text: Существует конкретное ранжирование и нейтральная, абсолютная перспектива, исходя из которой это ранжирование возможно
-  - from: "EV negation of (R-r).nns"
+  - type: consequence_of
+    from: "EV negation of (R-r).nns"
     to: EV->1
-    type: consequence_of

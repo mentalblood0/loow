@@ -64,17 +64,6 @@ describe Wool do
   end
 
   it "convertion", focus: true do
-    puts Union(NamedTuple(b: String), NamedTuple(a: String, b: String)).from_yaml "a: a\nb: b"
-    # {a: "a", b: "b"}
-
-    puts Union(NamedTuple(a: String), NamedTuple(a: String, b: String)).from_yaml "a: a\nb: b"
-    # {a: "a"}
-
-    puts Union(NamedTuple(a: String), NamedTuple(a: String, b: String)).from_yaml "b: b\na: a"
-    # {a: "a"}
-
-    exit()
-
     batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
     commands = batch.convert
     commands.each { |c| c.exec sweater }

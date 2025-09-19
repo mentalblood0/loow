@@ -10,8 +10,8 @@ module Wool
 
       alias AddText = String
       alias AddTextWId = {id: String, text: String}
-      alias AddRelation = {from: String, to: String, type: Wool::Type}
-      alias AddRelationWId = {id: String, from: String, to: String, type: Wool::Type}
+      alias AddRelation = {type: Type, from: String, to: String}
+      alias AddRelationWId = {id: String, type: Type, from: String, to: String}
       alias AddTags = {to: String, tags: Array(String)}
       alias Element = AddText |
                       AddTextWId |
