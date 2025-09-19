@@ -1,5 +1,3 @@
-require "yaml"
-
 require "./Sweater"
 
 module Wool
@@ -17,10 +15,13 @@ module Wool
 
     macro dc(n, a, b)
       struct {{n.stringify.camelcase.id}} < Command
+        include YAML::Serializable
+        include YAML::Serializable::Strict
+
         getter args : {{a}}
 
         def initialize(@args)
-          super("{{n}}")
+          @action = "{{n}}"
         end
 
         def exec(s : Sweater)
@@ -32,9 +33,6 @@ module Wool
     getter action : String
 
     myd action, add, delete, add_tags, delete_tags, get, get_by_tags
-
-    def initialize(@action)
-    end
 
     abstract def exec(s : Sweater)
 

@@ -1,33 +1,37 @@
-chest:
-  env:
-    opts:
-      sophia:
-        path: /tmp/wool/chest
-      db:
-        d: &ddbs
-          compression: zstd
-        i:
-          *ddbs
-        u:
-          *ddbs
-        o:
-          *ddbs
-index:
-  env:
-    opts:
-      sophia:
-        path: /tmp/wool/index
-      db:
-        t2o:
-          *ddbs
-        o2t:
-          *ddbs
-        i2t:
-          *ddbs
-        t2i:
-          *ddbs
-        i2o:
-          *ddbs
-        o2i:
-          *ddbs
-
+sweater:
+  chest:
+    env:
+      opts:
+        sophia:
+          path: /tmp/wool/chest
+        db:
+          d: &ddbs
+            compression: zstd
+          i:
+            *ddbs
+          u:
+            *ddbs
+          o:
+            *ddbs
+  index:
+    env:
+      opts:
+        sophia:
+          path: /tmp/wool/index
+        db:
+          t2o:
+            *ddbs
+          o2t:
+            *ddbs
+          i2t:
+            *ddbs
+          t2i:
+            *ddbs
+          i2o:
+            *ddbs
+          o2i:
+            *ddbs
+graph:
+  dest: /tmp/sweater_graph.dot
+conversion:
+  src: spec/batch.yml

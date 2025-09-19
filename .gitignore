@@ -13,3 +13,4 @@ benchmark
 *.o
 *.so
 *.so.*
+*_converted.yml

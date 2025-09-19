@@ -1,12 +1,23 @@
 require "spec"
 
 require "../src/Command"
+require "../src/Convertible"
 require "../src/Graph"
 
 rnd = Random.new 0
 
+alias Config = {sweater: Wool::Sweater, graph: {dest: String}, conversion: {src: String}}
+
 describe Wool do
-  sweater = Wool::Sweater.from_yaml File.read "spec/config.yml"
+  config = Config.from_yaml File.read "spec/config.yml"
+  sweater = config[:sweater]
+
+  Spec.after_each do
+    File.open config[:graph][:dest], "w" do |gio|
+      g = Wool::Graph.new sweater, wrap_width: 40
+      g.write gio
+    end
+  end
 
   it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
@@ -50,10 +61,23 @@ describe Wool do
       end
       i += 1
     end
+  end
 
-    File.open "/tmp/sweater_graph.dot", "w" do |gio|
-      g = Wool::Graph.new sweater, wrap_width: 20
-      g.write gio
-    end
+  it "convertion", focus: true do
+    puts Union(NamedTuple(b: String), NamedTuple(a: String, b: String)).from_yaml "a: a\nb: b"
+    # {a: "a", b: "b"}
+
+    puts Union(NamedTuple(a: String), NamedTuple(a: String, b: String)).from_yaml "a: a\nb: b"
+    # {a: "a"}
+
+    puts Union(NamedTuple(a: String), NamedTuple(a: String, b: String)).from_yaml "b: b\na: a"
+    # {a: "a"}
+
+    exit()
+
+    batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
+    commands = batch.convert
+    commands.each { |c| c.exec sweater }
+    puts commands.to_yaml
   end
 end

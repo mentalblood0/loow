@@ -15,6 +15,10 @@ module Wool
       json.string @value
     end
 
+    def to_yaml(yaml : YAML::Nodes::Builder)
+      yaml.scalar @value
+    end
+
     def to_bytes
       @value.hexbytes
     end
