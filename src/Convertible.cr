@@ -23,7 +23,6 @@ module Wool
       def convert : Array(Command)
         s2i = Hash(String, Id).new
         @elements.map do |e|
-          puts "#{e} #{s2i}"
           case e
           when AddText
             r = Command::Add.new({c: e})

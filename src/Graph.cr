@@ -30,10 +30,11 @@ module Wool
 
     def write(io : IO)
       io << "digraph sweater {"
-      @sweater.chest.oids do |oid|
+      io << "\n\trankdir=BT;"
+      @sweater.chest.objects do |oid, o|
         id = Id.from_oid oid
         ids = id.to_string
-        c = Content.from_json (@sweater.chest.get oid).not_nil!["content"].to_json
+        c = Content.from_json o["content"].to_json
         t = @sweater.index.get id.to_bytes
         tags = (t.size > 0) ? wrap (t.join ' '), @wrap_width : nil
         case c
