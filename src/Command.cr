@@ -32,7 +32,7 @@ module Wool
 
     getter action : String
 
-    myd action, add, delete, add_tags, delete_tags, get, get_by_tags
+    myd action, add, delete, add_tags, delete_tags, get, get_by_content, get_by_tags
 
     abstract def exec(s : Sweater)
 
@@ -53,6 +53,10 @@ module Wool
     end
 
     dc get, {id: Id}, begin
+      s.get **@args
+    end
+
+    dc get_by_content, {c: String}, begin
       s.get **@args
     end
 

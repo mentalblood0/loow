@@ -19,6 +19,13 @@ describe Wool do
     end
   end
 
+  it "can handle large theses" do
+    text = "B" * 1024 * 8
+    id = sweater.add text
+    (sweater.get id).not_nil![:content].should eq text
+    (sweater.get text).not_nil![:content].should eq text
+  end
+
   it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
     i = 0
@@ -58,6 +65,9 @@ describe Wool do
       sweater.ids.sort.should eq tt.keys.sort
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
+        if t.is_a? String
+          (Wool::Command::GetByContent.new({c: t[:content]}).exec sweater).should eq t
+        end
       end
       i += 1
     end
@@ -67,6 +77,5 @@ describe Wool do
     batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
     commands = batch.convert
     commands.each { |c| c.exec sweater }
-    puts commands.to_yaml
   end
 end
