@@ -65,9 +65,7 @@ describe Wool do
       sweater.ids.sort.should eq tt.keys.sort
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
-        if t.is_a? String
-          (Wool::Command::GetByContent.new({c: t[:content]}).exec sweater).should eq t
-        end
+        (Wool::Command::GetByContent.new({c: t[:content]}).exec sweater).should eq t
       end
       i += 1
     end

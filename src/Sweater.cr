@@ -49,8 +49,8 @@ module Wool
        tags: Set.new index.get id.to_bytes}
     end
 
-    def get(c : String) : Thesis?
-      get Id.from_oid (chest.unique "content", c).not_nil!
+    def get(c : Content) : Thesis?
+      get Id.from_content c
     end
 
     def delete(id : Id)

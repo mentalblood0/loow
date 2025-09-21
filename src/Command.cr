@@ -56,7 +56,7 @@ module Wool
       s.get **@args
     end
 
-    dc get_by_content, {c: String}, begin
+    dc get_by_content, {c: Content}, begin
       s.get **@args
     end
 
