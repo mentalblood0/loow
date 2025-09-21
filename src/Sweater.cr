@@ -10,16 +10,7 @@ module Wool
   class Exception < Exception
   end
 
-  enum Type : UInt8
-    Answers   = 0
-    Negates   = 1
-    MayBe     = 2
-    Means     = 3
-    Therefore = 4
-    Includes  = 5
-  end
-
-  alias Relation = {from: Id, to: Id, type: Type}
+  alias Relation = {from: Id, to: Id, type: String}
   alias Content = String | Relation
   alias Thesis = {content: Content, relations: {from: Set(Id), to: Set(Id)}, tags: Set(String)}
 
@@ -27,11 +18,13 @@ module Wool
     include YAML::Serializable
     include YAML::Serializable::Strict
 
+    getter relations_types : Set(String)
     getter chest : Trove::Chest
     getter index : Dream::Index
 
     def add(c : Content)
       if c.is_a? Relation
+        raise Exception.new "Relation type \"#{c[:type]}\" is not allowed in this Sweater" unless @relations_types.includes? c[:type]
         raise Exception.new "No \"from\" id #{c[:from].to_string} for relation" unless chest.has_key? c[:from].to_oid
         raise Exception.new "No \"to\" id #{c[:to].to_string} for relation" unless chest.has_key? c[:to].to_oid
       end

@@ -43,7 +43,7 @@ describe Wool do
         to = (tt.sample rnd)[0]
         c = {from: from,
              to:   to,
-             type: Wool::Type.values.sample rnd}
+             type: sweater.relations_types.sample rnd}
         id = Wool::Command::Add.new({c: c}).exec sweater
         tt[id] = {content:   c,
                   relations: {from: Set(Wool::Id).new,

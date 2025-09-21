@@ -3,12 +3,12 @@ elements:
     text: Релятивизм
   - id: R-r
     text: Полный релятивизм
-  - type: may_be
+  - type: may be
     from: R
     to: R-r
   - id: R-a
     text: "Неполный релятивизм: относительно все кроме этой относительности"
-  - type: may_be
+  - type: may be
     from: R
     to: R-a
   - id: (R-r).d
@@ -55,7 +55,7 @@ elements:
     to: A1
   - id: (R-r).0_true_relatively
     text: "'Все истины относительны' относительно истинно"
-  - type: may_be
+  - type: may be
     from: (R-r).0
     to: (R-r).0_true_relatively
   - id: A1.1.1
@@ -75,7 +75,7 @@ elements:
     to: R-r_false_absolutely
   - id: (R-r).0_true_absolutely
     text: "'Все истины относительны' абсолютно истинно"
-  - type: may_be
+  - type: may be
     from: (R-r).0
     to: (R-r).0_true_absolutely
   - type: therefore

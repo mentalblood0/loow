@@ -1,4 +1,11 @@
 sweater:
+  relations_types:
+  - answers
+  - negates
+  - may be
+  - means
+  - therefore
+  - includes
   chest:
     env:
       opts:
