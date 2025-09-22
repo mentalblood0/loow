@@ -8,15 +8,34 @@ module Wool
       include YAML::Serializable
       include YAML::Serializable::Strict
 
-      alias AddText = String
-      alias AddTextWId = {id: String, text: String}
-      alias AddRelation = {type: String, from: String, to: String}
-      alias AddRelationWId = {id: String, type: String, from: String, to: String}
-      alias AddTags = {to: String, tags: Array(String)}
+      class AddText
+        include YAML::Serializable
+        include YAML::Serializable::Strict
+
+        getter id : String? = nil
+        getter text : String
+      end
+
+      class AddRelation
+        include YAML::Serializable
+        include YAML::Serializable::Strict
+
+        getter id : String? = nil
+        getter type : String
+        getter from : String
+        getter to : String
+      end
+
+      class AddTags
+        include YAML::Serializable
+        include YAML::Serializable::Strict
+
+        getter to : String
+        getter tags : Array(String)
+      end
+
       alias Element = AddText |
-                      AddTextWId |
                       AddRelation |
-                      AddRelationWId |
                       AddTags
       getter elements : Array(Element)
 
@@ -25,17 +44,13 @@ module Wool
         @elements.map do |e|
           case e
           when AddText
-            r = Command::Add.new({c: e})
-          when AddTextWId
-            r = Command::Add.new({c: e[:text]})
-            s2i[e[:id]] = Id.from_content r.args[:c]
+            r = Command::Add.new({c: e.text})
+            s2i[e.id.not_nil!] = Id.from_content r.args[:c] if e.id
           when AddRelation
-            r = Command::Add.new({c: {from: s2i[e[:from]], to: s2i[e[:to]], type: e[:type]}})
-          when AddRelationWId
-            r = Command::Add.new({c: {from: s2i[e[:from]], to: s2i[e[:to]], type: e[:type]}})
-            s2i[e[:id]] = Id.from_content r.args[:c]
+            r = Command::Add.new({c: {from: s2i[e.from], to: s2i[e.to], type: e.type}})
+            s2i[e.id.not_nil!] = Id.from_content r.args[:c] if e.id
           when AddTags
-            r = Command::AddTags.new({id: s2i[e[:to]], tags: e[:tags]})
+            r = Command::AddTags.new({id: s2i[e.to], tags: e.tags})
           end
           r.not_nil!
         end
