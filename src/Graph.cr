@@ -33,7 +33,7 @@ module Wool
       end
 
       lines << current_line unless current_line.empty?
-      lines.join "\\n"
+      lines.join "<br/>"
     end
 
     def write(io : IO)
@@ -46,9 +46,13 @@ module Wool
         tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] : nil
         case c
         when String
-          text = wrap c, @config[:wrap_width]
+          text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ do |s|
+            String.build do |r|
+              (1..s.size - 4).step(6).each { |i| r << "<font color=\"##{s[i..i + 5]}\">▇</font>" }
+            end
+          end
           label = tags ? "{#{text}|#{tags}}" : text
-          io << "\n\t\"#{id.to_string}\" [label=\"#{label}\", shape=record, style=bold];"
+          io << "\n\t\"#{id.to_string}\" [label=<#{label}>, shape=record, style=bold];"
         when Relation
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
           label = tags ? "{#{text}|#{tags}}" : text

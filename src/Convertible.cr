@@ -44,7 +44,8 @@ module Wool
         @elements.map do |e|
           case e
           when AddText
-            r = Command::Add.new({c: e.text})
+            text = e.text.gsub /{[^{}]+}/ { |s| "{#{s2i[s[1..-2]].to_string}}" }
+            r = Command::Add.new({c: text})
             s2i[e.id.not_nil!] = Id.from_content r.args[:c] if e.id
           when AddRelation
             r = Command::Add.new({c: {from: s2i[e.from], to: s2i[e.to], type: e.type}})
