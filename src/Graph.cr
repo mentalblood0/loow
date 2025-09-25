@@ -3,12 +3,18 @@ require "./Sweater"
 module Wool
   class Graph
     enum Externalize
-      None    = 0
-      Related = 1
-      All     = 2
+      None
+      Related
+      All
     end
 
-    alias Config = {wrap_width: UInt16, externalize_relations_nodes: Externalize}
+    enum NodesIds
+      None
+      Mentioned
+      All
+    end
+
+    alias Config = {wrap_width: UInt16, externalize_relations_nodes: Externalize, nodes_ids: NodesIds}
 
     getter sweater : Sweater
     getter config : Config
@@ -36,6 +42,11 @@ module Wool
       lines.join "<br/>"
     end
 
+    def to_colors(id : Id)
+      s = id.to_string
+      String.build { |r| (0..s.size - 3).step(6).each { |i| r << "<font color=\"##{s[i..i + 5]}\">▇</font>" } }
+    end
+
     def write(io : IO)
       io << "digraph sweater {"
       @sweater.chest.objects do |oid, o|
@@ -43,19 +54,25 @@ module Wool
         ids = id.to_string
         c = Content.from_json o["content"].to_json
         t = @sweater.index.get id.to_bytes
-        tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] : nil
+        tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] // 2 : nil
         case c
         when String
-          text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ do |s|
-            String.build do |r|
-              (1..s.size - 4).step(6).each { |i| r << "<font color=\"##{s[i..i + 5]}\">▇</font>" }
-            end
-          end
-          label = tags ? "{#{text}|#{tags}}" : text
-          io << "\n\t\"#{id.to_string}\" [label=<#{label}>, shape=record, style=bold];"
+          text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
+          label = <<-HTML
+          <TABLE BORDER="2" CELLSPACING="0">
+            #{(@config[:nodes_ids] == NodesIds::All) ? "<TR><TD BORDER=\"1\" SIDES=\"b\">#{to_colors id}</TD></TR>" : ""}
+            <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
+          </TABLE>
+          HTML
+          io << "\n\t\"#{id.to_string}\" [label=<#{label}>, shape=plaintext];"
         when Relation
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
-          label = tags ? "{#{text}|#{tags}}" : text
+          label = <<-HTML
+          <TABLE CELLSPACING="0" STYLE="dashed">
+            #{(@config[:nodes_ids] == NodesIds::All) ? "<TR><TD SIDES=\"b\" STYLE=\"dashed\">#{to_colors id}</TD></TR>" : ""}
+            <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
+          </TABLE>
+          HTML
           fids = c[:from].to_string
           tids = c[:to].to_string
           iids = "#{fids} -> #{tids}"
@@ -68,10 +85,10 @@ module Wool
             io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
             io << "\n\t\"#{fids}\" -> \"#{iids}\" [arrowhead=none];"
             io << "\n\t\"#{iids}\" -> \"#{tids}\";"
-            io << "\n\t\"#{ids}\" [label=\"#{label}\", shape=record, style=dashed];"
+            io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
             io << "\n\t\"#{iids}\" -> \"#{ids}\" [dir=none, style=dotted];"
           else
-            io << "\n\t\"#{ids}\" [label=\"#{label}\", shape=record, style=dashed]"
+            io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext]"
             io << "\n\t\"#{fids}\" -> \"#{ids}\" [arrowhead=none];"
             io << "\n\t\"#{ids}\" -> \"#{tids}\";"
           end

@@ -43,5 +43,6 @@ graph:
   config:
     wrap_width: 40
     externalize_relations_nodes: none
+    nodes_ids: all
 conversion:
   src: spec/batch.yml
