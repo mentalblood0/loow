@@ -57,7 +57,7 @@ module Wool
         t = @sweater.index.get id.to_bytes
         tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] // 2 : nil
         show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
-                                                             @sweater.chest.unique "mention.what", id.to_string)
+                                                             @sweater.chest.unique "mention.what", ids)
         case c
         when String
           text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
@@ -67,7 +67,11 @@ module Wool
             <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
           </TABLE>
           HTML
-          io << "\n\t\"#{id.to_string}\" [label=<#{label}>, shape=plaintext];"
+          io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
+          c.scan /{([^{}]+)}/ do |m|
+            mid = Id.from_string m[1]
+            io << "\n\t\"#{ids}\" -> \"#{mid.to_string}\" [arrowhead=none, color=\"grey\" style=dotted];"
+          end
         when Relation
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
           label = <<-HTML
@@ -81,8 +85,8 @@ module Wool
           iids = "#{fids} -> #{tids}"
           if (@config[:externalize_relations_nodes] == Externalize::All) || (
                @config[:externalize_relations_nodes] == Externalize::Related && (
-                 (@sweater.chest.unique "thesis.content.from", id.to_string) ||
-                 (@sweater.chest.unique "thesis.content.to", id.to_string)
+                 (@sweater.chest.unique "thesis.content.from", ids) ||
+                 (@sweater.chest.unique "thesis.content.to", ids)
                )
              )
             io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"

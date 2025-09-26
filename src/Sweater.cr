@@ -34,7 +34,6 @@ module Wool
       when String
         c.scan /{([^{}]+)}/ do |m|
           mentioned_id = Id.from_string m[1]
-          puts "#{mentioned_id} mentioned in #{id}"
           mention_id = Id.from_ids id, mentioned_id
           @chest.set mention_id.to_oid, "", JSON.parse({type:    "mention",
                                                         mention: {what: mentioned_id.to_string,
