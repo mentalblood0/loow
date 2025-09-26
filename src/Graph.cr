@@ -50,17 +50,20 @@ module Wool
     def write(io : IO)
       io << "digraph sweater {"
       @sweater.chest.objects do |oid, o|
+        next unless o["type"] == "thesis"
         id = Id.from_oid oid
         ids = id.to_string
-        c = Content.from_json o["content"].to_json
+        c = Content.from_json o["thesis"]["content"].to_json
         t = @sweater.index.get id.to_bytes
         tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] // 2 : nil
+        show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
+                                                             @sweater.chest.unique "mention.what", id.to_string)
         case c
         when String
           text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
           label = <<-HTML
           <TABLE BORDER="2" CELLSPACING="0">
-            #{(@config[:nodes_ids] == NodesIds::All) ? "<TR><TD BORDER=\"1\" SIDES=\"b\">#{to_colors id}</TD></TR>" : ""}
+            #{show_id ? "<TR><TD BORDER=\"1\" SIDES=\"b\">#{to_colors id}</TD></TR>" : ""}
             <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
           </TABLE>
           HTML
@@ -69,7 +72,7 @@ module Wool
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
           label = <<-HTML
           <TABLE CELLSPACING="0" STYLE="dashed">
-            #{(@config[:nodes_ids] == NodesIds::All) ? "<TR><TD SIDES=\"b\" STYLE=\"dashed\">#{to_colors id}</TD></TR>" : ""}
+            #{show_id ? "<TR><TD SIDES=\"b\" STYLE=\"dashed\">#{to_colors id}</TD></TR>" : ""}
             <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
           </TABLE>
           HTML
@@ -78,8 +81,8 @@ module Wool
           iids = "#{fids} -> #{tids}"
           if (@config[:externalize_relations_nodes] == Externalize::All) || (
                @config[:externalize_relations_nodes] == Externalize::Related && (
-                 (@sweater.chest.unique "content.from", id.to_string) ||
-                 (@sweater.chest.unique "content.to", id.to_string)
+                 (@sweater.chest.unique "thesis.content.from", id.to_string) ||
+                 (@sweater.chest.unique "thesis.content.to", id.to_string)
                )
              )
             io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"

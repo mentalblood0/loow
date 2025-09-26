@@ -63,5 +63,15 @@ module Wool
       r = LibXxhash.xxhash128 src.to_slice, src.bytesize, 0
       from_oid({r.high64, r.low64})
     end
+
+    def self.from_ids(i1 : Id, i2 : Id)
+      r = Bytes.new 16
+      i1b = i1.to_bytes
+      i2b = i2.to_bytes
+      16.times do |i|
+        r[i] = i1b[i] ^ i2b[i]
+      end
+      Id.from_bytes r
+    end
   end
 end

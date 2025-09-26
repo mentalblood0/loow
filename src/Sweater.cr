@@ -13,6 +13,7 @@ module Wool
   alias Relation = {from: Id, to: Id, type: String}
   alias Content = String | Relation
   alias Thesis = {content: Content, relations: {from: Set(Id), to: Set(Id)}, tags: Set(String)}
+  alias Mention = {what: Id, where: Id}
 
   class Sweater
     include YAML::Serializable
@@ -23,16 +24,25 @@ module Wool
     getter index : Dream::Index
 
     def add(c : Content)
+      id = Id.from_content c
+
       case c
       when Relation
         raise Exception.new "Relation type \"#{c[:type]}\" is not allowed in this Sweater" unless @relations_types.includes? c[:type]
         raise Exception.new "No \"from\" id #{c[:from].to_string} for relation" unless chest.has_key? c[:from].to_oid
         raise Exception.new "No \"to\" id #{c[:to].to_string} for relation" unless chest.has_key? c[:to].to_oid
       when String
+        c.scan /{([^{}]+)}/ do |m|
+          mentioned_id = Id.from_string m[1]
+          puts "#{mentioned_id} mentioned in #{id}"
+          mention_id = Id.from_ids id, mentioned_id
+          @chest.set mention_id.to_oid, "", JSON.parse({type:    "mention",
+                                                        mention: {what: mentioned_id.to_string,
+                                                                  where: id.to_string}}.to_json)
+        end
       end
 
-      id = Id.from_content c
-      @chest.set id.to_oid, "", JSON.parse({content: c}.to_json)
+      @chest.set id.to_oid, "", JSON.parse({type: "thesis", thesis: {content: c}}.to_json)
       id
     end
 
@@ -45,9 +55,9 @@ module Wool
     end
 
     def get(id : Id) : Thesis?
-      {content:   (Content.from_json (@chest.get id.to_oid).not_nil!["content"].to_json rescue return nil),
-       relations: {from: (Set.new (@chest.where "content.from", id.to_string).map { |oid| Id.from_oid oid }),
-                   to: (Set.new (@chest.where "content.to", id.to_string).map { |oid| Id.from_oid oid })},
+      {content:   (Content.from_json (@chest.get id.to_oid).not_nil!["thesis"]["content"].to_json rescue return nil),
+       relations: {from: (Set.new (@chest.where "thesis.content.from", id.to_string).map { |oid| Id.from_oid oid }),
+                   to: (Set.new (@chest.where "thesis.content.to", id.to_string).map { |oid| Id.from_oid oid })},
        tags: Set.new @index.get id.to_bytes}
     end
 
@@ -58,8 +68,8 @@ module Wool
     def delete(id : Id)
       @chest.transaction do |ctx|
         @index.transaction do |itx|
-          ["content.from", "content.to"].each do |p|
-            @chest.where p, id.to_string do |oid|
+          ["from", "to"].each do |p|
+            @chest.where "thesis.content.#{p}", id.to_string do |oid|
               ctx.delete oid
               itx.delete (Id.from_oid oid).to_bytes
             end
