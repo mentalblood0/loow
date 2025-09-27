@@ -28,9 +28,10 @@ module Wool
       current_line = ""
 
       words.each do |word|
+        word_size = (word.match /{[^{}]+}/) ? 5 : word.size
         if current_line.empty?
           current_line = word
-        elsif current_line.size + word.size + 1 <= width
+        elsif current_line.size + word_size + 1 <= width
           current_line += " " + word
         else
           lines << current_line
