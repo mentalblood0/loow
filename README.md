@@ -1,6 +1,6 @@
-# 🐈 Wool
+# 🐈 Woollib
 
-Theses and relations storage
+Theses and relations storage library
 
 ## Installation
 
@@ -8,8 +8,8 @@ Theses and relations storage
 
    ```yaml
    dependencies:
-     wool:
-       github: mentalblood0/wool
+     woollib:
+       github: mentalblood0/woollib
    ```
 
 2. Run `shards install`

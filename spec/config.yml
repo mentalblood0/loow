@@ -10,7 +10,7 @@ sweater:
     env:
       opts:
         sophia:
-          path: /tmp/wool/chest
+          path: /tmp/woollib/chest
         db:
           d: &ddbs
             compression: zstd
@@ -24,7 +24,7 @@ sweater:
     env:
       opts:
         sophia:
-          path: /tmp/wool/index
+          path: /tmp/woollib/index
         db:
           t2o:
             *ddbs
