@@ -26,16 +26,20 @@ module Wool
       words = text.split
       lines = [] of String
       current_line = ""
+      current_line_size = 0
 
       words.each do |word|
         word_size = (word.match /{[^{}]+}/) ? 5 : word.size
         if current_line.empty?
           current_line = word
-        elsif current_line.size + word_size + 1 <= width
+          current_line_size = word_size
+        elsif current_line_size + 1 + word_size <= width
           current_line += " " + word
+          current_line_size += 1 + word_size
         else
           lines << current_line
           current_line = word
+          current_line_size = word_size
         end
       end
 
