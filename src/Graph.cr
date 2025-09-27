@@ -60,16 +60,18 @@ module Wool
         ids = id.to_string
         c = Content.from_json o["thesis"]["content"].to_json
         t = @sweater.index.get id.to_bytes
-        tags = (t.size > 0) ? wrap (t.join ' '), @config[:wrap_width] // 2 : nil
+        tags = (t.size > 0) ? wrap (t.map { |s| "##{s}" }.join ' '), @config[:wrap_width] // 3 : nil
         show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
                                                              @sweater.chest.unique "mention.what", ids)
+        header = (show_id ? to_colors id : "") + (tags || "")
+        header = nil if header.empty?
         case c
         when String
           text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
           label = <<-HTML
-          <TABLE BORDER="2" CELLSPACING="0">
-            #{show_id ? "<TR><TD BORDER=\"1\" SIDES=\"b\">#{to_colors id}</TD></TR>" : ""}
-            <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
+          <TABLE BORDER="2" CELLSPACING="0" CELLPADDING="8">
+            #{"<TR><TD BORDER=\"1\" SIDES=\"b\">#{header}</TD></TR>" if header}
+            <TR><TD BORDER="0">#{text}</TD></TR>
           </TABLE>
           HTML
           io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
@@ -81,8 +83,8 @@ module Wool
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
           label = <<-HTML
           <TABLE CELLSPACING="0" STYLE="dashed">
-            #{show_id ? "<TR><TD SIDES=\"b\" STYLE=\"dashed\">#{to_colors id}</TD></TR>" : ""}
-            <TR><TD BORDER="0">#{text}</TD>#{tags ? "<TD BORDER=\"0\">#{tags}</TD>" : ""}</TR>
+            #{"<TR><TD SIDES=\"b\" STYLE=\"dashed\">#{header}</TD></TR>" if header}
+            <TR><TD BORDER="0">#{text}</TD></TR>
           </TABLE>
           HTML
           fids = c[:from].to_string

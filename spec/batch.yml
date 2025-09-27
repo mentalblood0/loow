@@ -43,6 +43,10 @@ elements:
     to: EV_negation_of_(R-r).nns
   - id: (R-r).0 
     text: Все истины относительны
+  - to: (R-r).0
+    tags:
+    - total
+    - truth
   - type: therefore
     from: (R-r).d
     to: (R-r).0
