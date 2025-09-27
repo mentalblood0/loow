@@ -25,6 +25,7 @@ module Wool
 
     def add(c : Content)
       id = Id.from_content c
+      raise Exception.new "Content already exists" if @chest.has_key! id.to_oid, "type"
 
       case c
       when Relation
