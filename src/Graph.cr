@@ -98,13 +98,13 @@ module Wool
                )
              )
             io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
-            io << "\n\t\"#{fids}\" -> \"#{iids}\" [arrowhead=none];"
+            io << "\n\t\"#{fids}\" -> \"#{iids}\" [dir=back, arrowtail=tee];"
             io << "\n\t\"#{iids}\" -> \"#{tids}\";"
             io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
             io << "\n\t\"#{iids}\" -> \"#{ids}\" [dir=none, style=dotted];"
           else
             io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext]"
-            io << "\n\t\"#{fids}\" -> \"#{ids}\" [arrowhead=none];"
+            io << "\n\t\"#{fids}\" -> \"#{ids}\" [dir=back, arrowtail=tee];"
             io << "\n\t\"#{ids}\" -> \"#{tids}\";"
           end
         end
