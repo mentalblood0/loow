@@ -54,14 +54,13 @@ module Wool
 
     def write(io : IO)
       io << "digraph sweater {"
-      @sweater.chest.objects do |oid, o|
+      @sweater.chest.objects do |id, o|
         next unless o["type"] == "thesis"
-        id = Id.from_oid oid
-        ids = id.to_string
+        sid = id.to_string
         c = Content.from_json o["thesis"]["content"].to_json
-        tags = @sweater.index.get id.to_bytes
+        tags = ((Set(String).new o["tags"].as_h.keys) rescue Set(String).new)
         show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
-                                                             @sweater.chest.unique "mention.what", ids)
+                                                             @sweater.chest.where({"mention.what" => sid}))
         hl = [] of String
         hl << to_colors id if show_id
         hl << wrap (tags.map { |t| "##{t}" }.join ' '), @config[:wrap_width] unless tags.empty?
@@ -75,10 +74,10 @@ module Wool
             <TR><TD BORDER="0">#{text}</TD></TR>
           </TABLE>
           HTML
-          io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
+          io << "\n\t\"#{sid}\" [label=<#{label}>, shape=plaintext];"
           c.scan /{([^{}]+)}/ do |m|
             mid = Id.from_string m[1]
-            io << "\n\t\"#{ids}\" -> \"#{mid.to_string}\" [arrowhead=none, color=\"grey\" style=dotted];"
+            io << "\n\t\"#{sid}\" -> \"#{mid.to_string}\" [arrowhead=none, color=\"grey\" style=dotted];"
           end
         when Relation
           text = wrap (c[:type].to_s.underscore.gsub '_', ' '), @config[:wrap_width]
@@ -88,24 +87,24 @@ module Wool
             <TR><TD BORDER="0">#{text}</TD></TR>
           </TABLE>
           HTML
-          fids = c[:from].to_string
-          tids = c[:to].to_string
-          iids = "#{fids} -> #{tids}"
+          fsid = c[:from].to_string
+          tsid = c[:to].to_string
+          isid = "#{fsid} -> #{tsid}"
           if (@config[:externalize_relations_nodes] == Externalize::All) || (
                @config[:externalize_relations_nodes] == Externalize::Related && (
-                 (@sweater.chest.unique "thesis.content.from", ids) ||
-                 (@sweater.chest.unique "thesis.content.to", ids)
+                 (@sweater.chest.where({"thesis.content.from" => sid})) ||
+                 (@sweater.chest.where({"thesis.content.to" => sid}))
                )
              )
-            io << "\n\t\"#{iids}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
-            io << "\n\t\"#{fids}\" -> \"#{iids}\" [dir=back, arrowtail=tee];"
-            io << "\n\t\"#{iids}\" -> \"#{tids}\";"
-            io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext];"
-            io << "\n\t\"#{iids}\" -> \"#{ids}\" [dir=none, style=dotted];"
+            io << "\n\t\"#{isid}\" [label=\"\", style=invis, fixedsize=\"false\", width=0, height=0, shape=none]"
+            io << "\n\t\"#{fsid}\" -> \"#{isid}\" [dir=back, arrowtail=tee];"
+            io << "\n\t\"#{isid}\" -> \"#{tsid}\";"
+            io << "\n\t\"#{sid}\" [label=<#{label}>, shape=plaintext];"
+            io << "\n\t\"#{isid}\" -> \"#{sid}\" [dir=none, style=dotted];"
           else
-            io << "\n\t\"#{ids}\" [label=<#{label}>, shape=plaintext]"
-            io << "\n\t\"#{fids}\" -> \"#{ids}\" [dir=back, arrowtail=tee];"
-            io << "\n\t\"#{ids}\" -> \"#{tids}\";"
+            io << "\n\t\"#{sid}\" [label=<#{label}>, shape=plaintext]"
+            io << "\n\t\"#{fsid}\" -> \"#{sid}\" [dir=back, arrowtail=tee];"
+            io << "\n\t\"#{sid}\" -> \"#{tsid}\";"
           end
         end
       end

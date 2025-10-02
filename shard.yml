@@ -9,8 +9,6 @@ dependencies:
     github: mentalblood0/xxhash128
   trove:
     github: mentalblood0/trove
-  dream:
-    github: mentalblood0/dream
 
 crystal: '>= 1.16.3'
 

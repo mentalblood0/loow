@@ -10,34 +10,24 @@ sweater:
     env:
       opts:
         sophia:
-          path: /tmp/woollib/chest
+          path: /tmp/woollib/trove/data
         db:
           d: &ddbs
             compression: zstd
-          i:
-            *ddbs
-          u:
-            *ddbs
-          o:
-            *ddbs
-  index:
-    env:
-      opts:
-        sophia:
-          path: /tmp/woollib/index
-        db:
-          t2o:
-            *ddbs
-          o2t:
-            *ddbs
-          i2t:
-            *ddbs
-          t2i:
-            *ddbs
-          i2o:
-            *ddbs
-          o2i:
-            *ddbs
+    index:
+      env:
+        opts:
+          sophia:
+            path: /tmp/woollib/trove/index
+          db:
+            t2o:
+              *ddbs
+            o2t:
+              *ddbs
+            d2v:
+              *ddbs
+            c:
+              *ddbs
 graph:
   dest: /tmp/sweater_graph.dot
   config:

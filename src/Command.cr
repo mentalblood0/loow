@@ -60,7 +60,7 @@ module Wool
       s.get **@args
     end
 
-    dc get_by_tags, {present: Array(String), absent: Array(String), limit: UInt32, from: Id?}, begin
+    dc get_by_tags, {present: Array(String), absent: Array(String), from: Id?, limit: UInt64}, begin
       s.get **@args
     end
   end

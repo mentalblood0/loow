@@ -1,77 +1,49 @@
 require "json"
 
+require "trove"
+
 module Wool
-  struct Id
-    @value : String
+  alias Id = Trove::Oid
+end
 
-    protected def initialize(@value)
-    end
-
-    def <=>(other : Id)
-      to_string <=> other.to_string
-    end
-
+module Trove
+  struct Oid
     def to_json(json : JSON::Builder)
-      json.string @value
+      json.string to_string
     end
 
     def to_yaml(yaml : YAML::Nodes::Builder)
       yaml.scalar @value
     end
 
-    def to_bytes
-      @value.hexbytes
-    end
-
-    def to_oid : Trove::Oid
-      b = to_bytes
-      {IO::ByteFormat::BigEndian.decode(UInt64, b[0..7]),
-       IO::ByteFormat::BigEndian.decode(UInt64, b[8..15])}
-    end
-
-    def to_string : String
-      @value
-    end
-
     def initialize(pull : JSON::PullParser)
-      @value = pull.read_string
+      @value = (Oid.from_string pull.read_string).value
     end
 
-    def self.from_oid(oid : Trove::Oid)
-      r = Bytes.new 16
-      IO::ByteFormat::BigEndian.encode oid[0], r[0..7]
-      IO::ByteFormat::BigEndian.encode oid[1], r[8..15]
-      new r.hexstring
-    end
-
-    def self.from_bytes(b : Bytes)
-      new b.hexstring
-    end
-
-    def self.from_string(s : String)
-      new s
+    def initialize(pull : YAML::PullParser)
+      @value = (Oid.from_string pull.read_scalar).value
     end
 
     def self.from_content(c : String)
       r = LibXxhash.xxhash128 c.to_slice, c.bytesize, 0
-      from_oid({r.high64, r.low64})
+      Oid.new({r.high64, r.low64})
     end
 
-    def self.from_content(rel : Relation)
+    def self.from_content(rel : Wool::Relation)
       t = rel[:type]
       src = rel[:from].to_bytes + rel[:to].to_bytes + pointerof(t).as(UInt8*).to_slice(1)
       r = LibXxhash.xxhash128 src.to_slice, src.bytesize, 0
-      from_oid({r.high64, r.low64})
+      Oid.new({r.high64, r.low64})
     end
 
-    def self.from_ids(i1 : Id, i2 : Id)
+    def self.from_ids(i1 : Oid, i2 : Oid)
       r = Bytes.new 16
       i1b = i1.to_bytes
       i2b = i2.to_bytes
       16.times do |i|
         r[i] = i1b[i] ^ i2b[i]
       end
-      Id.from_bytes r
+      Oid.from_bytes r
     end
   end
 end
