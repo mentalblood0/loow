@@ -20,10 +20,9 @@ describe Wool do
   end
 
   it "can handle large theses" do
-    text = "B" * 1024 * 8
-    id = sweater.add text
-    (sweater.get id).not_nil![:content].should eq text
-    (sweater.get text).not_nil![:content].should eq text
+    t = Wool::Text.new "B" * 1024 * 8
+    id = sweater.add t
+    (sweater.get id).not_nil!.content.should eq t
   end
 
   it "generative" do
@@ -32,39 +31,32 @@ describe Wool do
     until i == 100
       case rnd.rand 0..3
       when 0
-        c = rnd.hex 17
+        c = Wool::Text.new rnd.hex 17
         id = Wool::Command::Add.new({c: c}).exec sweater
-        tt[id] = {content:   c,
-                  relations: {from: Set(Wool::Id).new,
-                              to: Set(Wool::Id).new},
-                  tags: Set(String).new}
+        tt[id] = Wool::Thesis.new c
       when 1
-        from = (tt.sample rnd rescue next)[0]
-        to = (tt.sample rnd)[0]
-        c = {from: from,
-             to:   to,
-             type: sweater.relations_types.sample rnd}
+        from =
+          to = (tt.sample rnd)[0]
+        c = Wool::Relation.new(
+          from: (tt.sample rnd rescue next)[0],
+          to: (tt.sample rnd rescue next)[0],
+          type: sweater.relations_types.sample rnd
+        )
         id = Wool::Command::Add.new({c: c}).exec sweater
-        tt[id] = {content:   c,
-                  relations: {from: Set(Wool::Id).new,
-                              to: Set(Wool::Id).new},
-                  tags: Set(String).new}
-        tt[from][:relations][:from] << id
-        tt[to][:relations][:to] << id
+        tt[id] = Wool::Thesis.new c
       when 2
         id = (tt.sample rnd rescue next)[0]
-        tags = Array.new (rnd.rand 1..8) { rnd.hex 1 }
+        tags = Set.new Array.new (rnd.rand 1..8) { Wool::Tag.new rnd.hex 1 }
         Wool::Command::AddTags.new({id: id, tags: tags}).exec sweater
-        tt[id][:tags].concat tags
+        tt[id].tags.concat tags
       when 3
         id = (tt.sample rnd rescue next)[0]
-        tags = tt[id][:tags].sample (rnd.rand 1..8), rnd rescue next
+        tags = Set.new tt[id].tags.sample (rnd.rand 1..8), rnd rescue next
         Wool::Command::DeleteTags.new({id: id, tags: tags}).exec sweater
-        tt[id][:tags].subtract tags
+        tt[id].tags.subtract tags
       end
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
-        (Wool::Command::GetByContent.new({c: t[:content]}).exec sweater).should eq t
       end
       i += 1
     end

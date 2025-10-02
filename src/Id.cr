@@ -9,7 +9,7 @@ end
 module Trove
   struct Oid
     def to_json(json : JSON::Builder)
-      json.string to_string
+      json.string string
     end
 
     def to_yaml(yaml : YAML::Nodes::Builder)
@@ -25,6 +25,7 @@ module Trove
     end
 
     def self.from_serializable(s)
+      j = s.to_json
       r = LibXxhash.xxhash128 j.to_slice, j.bytesize, 0
       Oid.new({r.high64, r.low64})
     end

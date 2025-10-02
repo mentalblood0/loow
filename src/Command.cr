@@ -32,7 +32,7 @@ module Wool
 
     getter action : String
 
-    myd action, add, delete, add_tags, delete_tags, get, get_by_content, get_by_tags
+    myd action, add, delete, add_tags, delete_tags, get, get_related, get_by_tags
 
     abstract def exec(s : Sweater)
 
@@ -44,11 +44,11 @@ module Wool
       s.delete **@args
     end
 
-    dc add_tags, {id: Id, tags: Array(String)}, begin
+    dc add_tags, {id: Id, tags: Set(Tag)}, begin
       s.add **@args
     end
 
-    dc delete_tags, {id: Id, tags: Array(String)}, begin
+    dc delete_tags, {id: Id, tags: Set(Tag)}, begin
       s.delete **@args
     end
 
@@ -56,11 +56,11 @@ module Wool
       s.get **@args
     end
 
-    dc get_by_content, {c: Content}, begin
-      s.get **@args
+    dc get_related, {id: Id}, begin
+      s.get_related **@args
     end
 
-    dc get_by_tags, {present: Array(String), absent: Array(String), from: Id?, limit: UInt64}, begin
+    dc get_by_tags, {present: Set(Tag), absent: Set(Tag), from: Id?, limit: UInt64}, begin
       s.get **@args
     end
   end

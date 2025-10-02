@@ -1,24 +1,21 @@
-require "./Command.cr"
+require "./Command"
 
 module Wool
   abstract class Convertible
     abstract def convert : Array(Command)
 
     class Batch < Convertible
-      include YAML::Serializable
-      include YAML::Serializable::Strict
+      mserializable
 
       class AddText
-        include YAML::Serializable
-        include YAML::Serializable::Strict
+        mserializable
 
         getter id : String? = nil
         getter text : String
       end
 
       class AddRelation
-        include YAML::Serializable
-        include YAML::Serializable::Strict
+        mserializable
 
         getter id : String? = nil
         getter type : String
@@ -27,8 +24,7 @@ module Wool
       end
 
       class AddTags
-        include YAML::Serializable
-        include YAML::Serializable::Strict
+        mserializable
 
         getter to : String
         getter tags : Array(String)
@@ -44,14 +40,14 @@ module Wool
         @elements.map do |e|
           case e
           when AddText
-            text = e.text.gsub /{[^{}]+}/ { |s| "{#{s2i[s[1..-2]].to_string}}" }
+            text = Text.new e.text.gsub /{[^{}]+}/ { |s| "{#{s2i[s[1..-2]].string}}" }
             r = Command::Add.new({c: text})
-            s2i[e.id.not_nil!] = Id.from_content r.args[:c] if e.id
+            s2i[e.id.not_nil!] = r.args[:c].id if e.id
           when AddRelation
-            r = Command::Add.new({c: {from: s2i[e.from], to: s2i[e.to], type: e.type}})
-            s2i[e.id.not_nil!] = Id.from_content r.args[:c] if e.id
+            r = Command::Add.new({c: Relation.new from: s2i[e.from], to: s2i[e.to], type: Relation::Type.new e.type})
+            s2i[e.id.not_nil!] = r.args[:c].id if e.id
           when AddTags
-            r = Command::AddTags.new({id: s2i[e.to], tags: e.tags})
+            r = Command::AddTags.new({id: s2i[e.to], tags: Set.new e.tags.map { |t| Tag.new t }})
           end
           r.not_nil!
         end
