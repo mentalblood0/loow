@@ -23,7 +23,7 @@ module Wool
         when Text
           c.mentions.map { |m| tx.set m.id, "", Wool.to_tj m }
         when Relation
-          raise Exception.new "Relation type \"#{c.type}\" is not allowed in this Sweater" unless @relations_types.includes? c.type
+          raise Exception.new "Relation type #{c.type.to_json} is not allowed in this Sweater, allowed types are #{(relations_types.map &.to_json).join ", "}" unless @relations_types.includes? c.type
           raise Exception.new "No \"from\" id \"#{c.from.string}\" for relation" unless tx.has_key! c.from, "type"
           raise Exception.new "No \"to\" id \"#{c.to.string}\" for relation" unless tx.has_key! c.to, "type"
         end
