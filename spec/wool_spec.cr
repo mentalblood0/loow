@@ -25,7 +25,7 @@ describe Wool do
     (sweater.get id).not_nil!.content.should eq t
   end
 
-  it "generative" do
+  it "generative", focus: true do
     tt = {} of Wool::Id => Wool::Thesis
     i = 0
     until i == 100
@@ -55,13 +55,16 @@ describe Wool do
       end
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
-        (sweater.get_relations id).should eq(Set.new tt.values.select { |rt| ((c = rt.content).is_a? Wool::Relation) && ((c.from == id) || (c.to == id)) })
+        (Wool::Command::GetRelations.new({id: id}).exec sweater).should eq(Set.new tt.values.select { |rt| ((c = rt.content).is_a? Wool::Relation) && ((c.from == id) || (c.to == id)) })
+        unless t.tags.empty?
+          ((Wool::Command::GetByTags.new({present: t.tags, absent: Set(Wool::Tag).new, from: nil, limit: UInt64::MAX}).exec sweater).includes? id).should eq true
+        end
       end
       i += 1
     end
   end
 
-  it "conversion", focus: true do
+  it "conversion" do
     batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
     commands = batch.convert
     commands.each { |c| c.exec sweater }

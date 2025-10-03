@@ -69,8 +69,8 @@ module Wool
 
     def get(present : Set(Tag), absent : Set(Tag) = Set(Tag).new, from : Id? = nil, &block : Id ->)
       @chest.where(
-        (Hash.zip present.map { |t| "thesis.tags.#{t}" }, Array.new(present.size) { nil }),
-        (Hash.zip absent.map { |t| "thesis.tags.#{t}" }, Array.new(absent.size) { nil }),
+        (Hash.zip present.map { |t| "thesis.tags.#{t.name}" }, Array.new(present.size) { nil }),
+        (Hash.zip absent.map { |t| "thesis.tags.#{t.name}" }, Array.new(absent.size) { nil }),
         from) { |i| yield i }
     end
 
