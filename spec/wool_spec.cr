@@ -55,7 +55,7 @@ describe Wool do
       end
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
-        (sweater.get_related id).should eq(Set.new tt.values.select { |rt| ((c = rt.content).is_a? Wool::Relation) && ((c.from == id) || (c.to == id)) })
+        (sweater.get_relations id).should eq(Set.new tt.values.select { |rt| ((c = rt.content).is_a? Wool::Relation) && ((c.from == id) || (c.to == id)) })
       end
       i += 1
     end

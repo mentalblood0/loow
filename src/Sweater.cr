@@ -55,15 +55,15 @@ module Wool
       Wool.from_tj Thesis, (@chest.get id).not_nil! rescue nil
     end
 
-    def get_related(id : Id, &block : Thesis ->)
+    def get_relations(id : Id, &block : Thesis ->)
       ["from", "to"].each do |p|
         @chest.where({"thesis.content.#{p}" => id.string}) { |ri| yield Wool.from_tj Thesis, (@chest.get ri).not_nil! }
       end
     end
 
-    def get_related(id : Id) : Set(Thesis)
+    def get_relations(id : Id) : Set(Thesis)
       r = Set(Thesis).new
-      get_related(id) { |re| r << re }
+      get_relations(id) { |re| r << re }
       r
     end
 
