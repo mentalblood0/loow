@@ -28,7 +28,8 @@ module Wool
           raise Exception.new "No \"to\" id \"#{c.to.string}\" for relation" unless tx.has_key! c.to, "type"
         end
 
-        tx.set c.id, "", Wool.to_tj Thesis.new c
+        th = Thesis.new c
+        tx.set c.id, "", Wool.to_tj th
       end
       c.id
     end
@@ -56,7 +57,7 @@ module Wool
 
     def get_related(id : Id, &block : Thesis ->)
       ["from", "to"].each do |p|
-        @chest.where({"thesis.content.value.#{p}" => id.string}) { |ri| yield Wool.from_tj Thesis, (@chest.get ri).not_nil! }
+        @chest.where({"thesis.content.#{p}" => id.string}) { |ri| yield Wool.from_tj Thesis, (@chest.get ri).not_nil! }
       end
     end
 

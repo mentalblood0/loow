@@ -60,7 +60,7 @@ module Wool
                                                              @sweater.chest.where({"mention.what" => id.string}))
         hl = [] of String
         hl << to_colors id if show_id
-        hl << wrap (th.tags.map { |t| "##{t}" }.join ' '), @config[:wrap_width] unless th.tags.empty?
+        hl << wrap (th.tags.map { |t| "##{t.name}" }.join ' '), @config[:wrap_width] unless th.tags.empty?
         h = hl.empty? ? nil : hl.join "<br/>"
         case c = th.content
         when Text

@@ -35,8 +35,6 @@ describe Wool do
         id = Wool::Command::Add.new({c: c}).exec sweater
         tt[id] = Wool::Thesis.new c
       when 1
-        from =
-          to = (tt.sample rnd)[0]
         c = Wool::Relation.new(
           from: (tt.sample rnd rescue next)[0],
           to: (tt.sample rnd rescue next)[0],
@@ -46,7 +44,7 @@ describe Wool do
         tt[id] = Wool::Thesis.new c
       when 2
         id = (tt.sample rnd rescue next)[0]
-        tags = Set.new Array.new (rnd.rand 1..8) { Wool::Tag.new rnd.hex 1 }
+        tags = Set.new Array.new (rnd.rand 1..8) { Wool::Tag.new "t" + rnd.hex 1 }
         Wool::Command::AddTags.new({id: id, tags: tags}).exec sweater
         tt[id].tags.concat tags
       when 3
@@ -57,10 +55,7 @@ describe Wool do
       end
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
-        if (c = t.content).is_a? Wool::Relation
-          (tt.has_key? c.from).should eq true
-          (tt.has_key? c.to).should eq true
-        end
+        (sweater.get_related id).should eq(Set.new tt.values.select { |rt| ((c = rt.content).is_a? Wool::Relation) && ((c.from == id) || (c.to == id)) })
       end
       i += 1
     end
