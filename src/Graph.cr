@@ -57,7 +57,7 @@ module Wool
       @sweater.chest.objects do |id, o|
         th = Wool.from_tj Thesis, o rescue next
         show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
-                                                             @sweater.chest.where({"mention.what" => id.string}))
+                                                             !@sweater.chest.where({"mention.what" => id.string}).empty?)
         hl = [] of String
         hl << to_colors id if show_id
         hl << wrap (th.tags.map { |t| "##{t.name}" }.join ' '), @config[:wrap_width] unless th.tags.empty?
