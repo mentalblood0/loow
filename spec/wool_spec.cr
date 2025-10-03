@@ -57,6 +57,10 @@ describe Wool do
       end
       tt.each do |id, t|
         (Wool::Command::Get.new({id: id}).exec sweater).should eq t
+        if (c = t.content).is_a? Wool::Relation
+          (tt.has_key? c.from).should eq true
+          (tt.has_key? c.to).should eq true
+        end
       end
       i += 1
     end
