@@ -9,6 +9,8 @@ module Wool
 
     getter name : String
 
+    def_equals_and_hash @name
+
     def initialize(@name)
       after_initialize
     end

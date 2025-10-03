@@ -6,7 +6,9 @@ module Wool
     mserializable
 
     getter content : Content
-    getter tags : Set(Tag)
+    getter tags : Set(Tag) = Set(Tag).new
+
+    def_equals_and_hash @content
 
     getter id : Id { @content.id }
 

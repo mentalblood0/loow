@@ -55,18 +55,16 @@ module Wool
     def write(io : IO)
       io << "digraph sweater {"
       @sweater.chest.objects do |id, o|
-        next unless o["type"] == "thesis"
-        c = Content.from_json o["thesis"]["content"].to_json
-        tags = ((Set(String).new o["tags"].as_h.keys) rescue Set(String).new)
+        th = Wool.from_tj Thesis, o rescue next
         show_id = (@config[:nodes_ids] == NodesIds::All) || ((@config[:nodes_ids] == NodesIds::Mentioned) &&
                                                              @sweater.chest.where({"mention.what" => id.string}))
         hl = [] of String
         hl << to_colors id if show_id
-        hl << wrap (tags.map { |t| "##{t}" }.join ' '), @config[:wrap_width] unless tags.empty?
+        hl << wrap (th.tags.map { |t| "##{t}" }.join ' '), @config[:wrap_width] unless th.tags.empty?
         h = hl.empty? ? nil : hl.join "<br/>"
-        case c
-        when String
-          text = (wrap c, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
+        case c = th.content
+        when Text
+          text = (wrap c.value, @config[:wrap_width]).gsub /{[^{}]+}/ { |s| to_colors Id.from_string s[1..s.size - 2] }
           label = <<-HTML
           <TABLE BORDER="2" CELLSPACING="0" CELLPADDING="8">
             #{"<TR><TD BORDER=\"1\" SIDES=\"b\">#{h}</TD></TR>" if h}
@@ -74,9 +72,9 @@ module Wool
           </TABLE>
           HTML
           io << "\n\t\"#{id.string}\" [label=<#{label}>, shape=plaintext];"
-          c.scan /{([^{}]+)}/ do |m|
+          c.value.scan /{([^{}]+)}/ do |m|
             mid = Id.from_string m[1]
-            io << "\n\t\"#{sid}\" -> \"#{mid.string}\" [arrowhead=none, color=\"grey\" style=dotted];"
+            io << "\n\t\"#{id.string}\" -> \"#{mid.string}\" [arrowhead=none, color=\"grey\" style=dotted];"
           end
         when Relation
           label = <<-HTML

@@ -11,6 +11,8 @@ module Wool
 
       getter name : String
 
+      def_equals_and_hash @name
+
       def initialize(@name)
         after_initialize
       end
@@ -23,6 +25,8 @@ module Wool
     getter from : Id
     getter type : Type
     getter to : Id
+
+    def_equals_and_hash @from, @type, @to
 
     getter id : Id { Id.from_serializable self }
     getter mentions : Set(Mention) { Set(Mention).new }
