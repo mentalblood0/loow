@@ -44,11 +44,11 @@ module Wool
     end
 
     def add(id : Id, tags : Set(Tag))
-      @chest.transaction { |tx| tags.each { |t| tx.set! id, "thesis.tags.#{t.name}", JSON::Any.new nil } }
+      @chest.push id, "thesis.tags", tags.map { |t| JSON::Any.new t.name }
     end
 
     def delete(id : Id, tags : Set(Tag))
-      @chest.transaction { |tx| tags.each { |t| tx.delete! id, "thesis.tags.#{t.name}" } }
+      @chest.transaction { |tx| tags.each { |t| tx.delete! id, "thesis.tags.#{tx.index id, "thesis.tags", t.name}" } }
     end
 
     def get(id : Id) : Thesis?
@@ -69,8 +69,8 @@ module Wool
 
     def get(present : Set(Tag), absent : Set(Tag) = Set(Tag).new, from : Id? = nil, &block : Id ->)
       @chest.where(
-        (Hash.zip present.map { |t| "thesis.tags.#{t.name}" }, Array.new(present.size) { nil }),
-        (Hash.zip absent.map { |t| "thesis.tags.#{t.name}" }, Array.new(absent.size) { nil }),
+        (Hash.zip Array.new(present.size) { "thesis.tags" }, present.map { |t| t.name }),
+        (Hash.zip Array.new(absent.size) { "thesis.tags" }, absent.map { |t| t.name }),
         from) { |i| yield i }
     end
 

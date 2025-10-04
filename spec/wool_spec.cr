@@ -25,7 +25,7 @@ describe Wool do
     (sweater.get id).not_nil!.content.should eq t
   end
 
-  it "generative", focus: true do
+  it "generative" do
     tt = {} of Wool::Id => Wool::Thesis
     i = 0
     until i == 100
@@ -64,7 +64,7 @@ describe Wool do
     end
   end
 
-  it "conversion" do
+  it "conversion", focus: true do
     batch = Wool::Convertible::Batch.from_yaml File.read config[:conversion][:src]
     commands = batch.convert
     commands.each { |c| c.exec sweater }

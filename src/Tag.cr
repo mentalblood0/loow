@@ -11,6 +11,14 @@ module Wool
 
     def_equals_and_hash @name
 
+    def to_json(json : JSON::Builder)
+      json.string @name
+    end
+
+    def initialize(pull : JSON::PullParser)
+      @name = pull.read_string
+    end
+
     def initialize(@name)
       after_initialize
     end
