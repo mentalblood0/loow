@@ -2,11 +2,15 @@ require "./Sweater"
 
 module Wool
   abstract struct Command
-    include YAML::Serializable
-    include YAML::Serializable::Strict
+    mserializable
 
-    macro myd(d, *nn)
+    macro mjyd(d, *nn)
       use_yaml_discriminator "{{d}}", {
+        {% for n in nn %}
+          {{n}}: {{n.stringify.camelcase.id}},
+        {% end %}
+      }
+      use_json_discriminator "{{d}}", {
         {% for n in nn %}
           {{n}}: {{n.stringify.camelcase.id}},
         {% end %}
@@ -15,10 +19,11 @@ module Wool
 
     macro dc(n, a, b)
       struct {{n.stringify.camelcase.id}} < Command
-        include YAML::Serializable
-        include YAML::Serializable::Strict
+        mserializable
 
         getter args : {{a}}
+
+        def_equals_and_hash @action, @args
 
         def initialize(@args)
           @action = "{{n}}"
@@ -32,7 +37,7 @@ module Wool
 
     getter action : String
 
-    myd action, add, delete, add_tags, delete_tags, get, get_relations, get_by_tags
+    mjyd action, add, delete, add_tags, delete_tags, get, get_relations, get_by_tags
 
     abstract def exec(s : Sweater)
 

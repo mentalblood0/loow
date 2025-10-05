@@ -12,6 +12,11 @@ describe Wool do
   config = Config.from_yaml File.read "spec/config.yml"
   sweater = config[:sweater]
 
+  it "can serialize Command to JSON", focus: true do
+    c = Wool::Command::Add.new({c: Wool::Text.new "text"})
+    (Wool::Command.from_json c.to_json).should eq c
+  end
+
   Spec.after_each do
     File.open config[:graph][:dest], "w" do |gio|
       g = Wool::Graph.new sweater, config[:graph][:config]
