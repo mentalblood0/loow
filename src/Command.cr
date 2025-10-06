@@ -1,7 +1,7 @@
 require "./Sweater"
 
 module Wool
-  abstract struct Command
+  abstract struct Command(T)
     mserializable
 
     macro mjyd(d, *nn)
@@ -17,8 +17,8 @@ module Wool
       }
     end
 
-    macro dc(n, a, b)
-      struct {{n.stringify.camelcase.id}} < Command
+    macro dc(t, n, a, b)
+      struct {{n.stringify.camelcase.id}} < Command({{t}})
         mserializable
 
         getter args : {{a}}
@@ -39,33 +39,33 @@ module Wool
 
     mjyd action, add, delete, add_tags, delete_tags, get, get_relations, get_by_tags
 
-    abstract def exec(s : Sweater)
+    abstract def exec(s : T)
 
-    dc add, {c: Content}, begin
+    dc Sweater, add, {c: Content}, begin
       s.add **@args
     end
 
-    dc delete, {id: Id}, begin
+    dc Sweater, delete, {id: Id}, begin
       s.delete **@args
     end
 
-    dc add_tags, {id: Id, tags: Set(Tag)}, begin
+    dc Sweater, add_tags, {id: Id, tags: Set(Tag)}, begin
       s.add **@args
     end
 
-    dc delete_tags, {id: Id, tags: Set(Tag)}, begin
+    dc Sweater, delete_tags, {id: Id, tags: Set(Tag)}, begin
       s.delete **@args
     end
 
-    dc get, {id: Id}, begin
+    dc Sweater, get, {id: Id}, begin
       s.get **@args
     end
 
-    dc get_relations, {id: Id}, begin
+    dc Sweater, get_relations, {id: Id}, begin
       s.get_relations **@args
     end
 
-    dc get_by_tags, {present: Set(Tag), absent: Set(Tag), from: Id?, limit: UInt64}, begin
+    dc Sweater, get_by_tags, {present: Set(Tag), absent: Set(Tag), from: Id?, limit: UInt64}, begin
       s.get **@args
     end
   end

@@ -1,10 +1,16 @@
 require "./Command"
 
 module Wool
-  abstract class Convertible
-    abstract def convert : Array(Command)
+  abstract class Convertible(T)
+    abstract def convert(&block : T ->) : Nil
 
-    class Batch < Convertible
+    def convert
+      r = Array(T).new
+      convert { |t| r << t }
+      r
+    end
+
+    class Batch < Convertible(Command(Sweater))
       mserializable
 
       class AddText
@@ -35,9 +41,12 @@ module Wool
                       AddTags
       getter elements : Array(Element)
 
-      def convert : Array(Command)
+      def initialize(@elements)
+      end
+
+      def convert(&block : T ->) : Nil
         s2i = Hash(String, Id).new
-        @elements.map do |e|
+        @elements.each do |e|
           case e
           when AddText
             text = Text.new e.text.gsub /{[^{}]+}/ { |s| "{#{s2i[s[1..-2]].string}}" }
@@ -49,7 +58,7 @@ module Wool
           when AddTags
             r = Command::AddTags.new({id: s2i[e.to], tags: Set.new e.tags.map { |t| Tag.new t }})
           end
-          r.not_nil!
+          yield r.not_nil!
         end
       end
     end
