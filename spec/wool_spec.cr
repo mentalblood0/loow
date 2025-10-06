@@ -25,9 +25,8 @@ describe Wool do
   end
 
   it "can handle large theses" do
-    t = Wool::Text.new "B" * 1024 * 8
-    id = sweater.add t
-    (sweater.get id).not_nil!.content.should eq t
+    th = sweater.add Wool::Text.new "B" * 1024 * 8
+    (sweater.get th.id).not_nil!.should eq th
   end
 
   it "generative" do
@@ -37,16 +36,16 @@ describe Wool do
       case rnd.rand 0..3
       when 0
         c = Wool::Text.new rnd.hex 17
-        id = Wool::Command::Add.new({c: c}).exec sweater
-        tt[id] = Wool::Thesis.new c
+        th = Wool::Command::Add.new({c: c}).exec sweater
+        tt[th.id] = th
       when 1
         c = Wool::Relation.new(
           from: (tt.sample rnd rescue next)[0],
           to: (tt.sample rnd rescue next)[0],
           type: sweater.relations_types.sample rnd
         )
-        id = Wool::Command::Add.new({c: c}).exec sweater
-        tt[id] = Wool::Thesis.new c
+        th = Wool::Command::Add.new({c: c}).exec sweater
+        tt[th.id] = th
       when 2
         id = (tt.sample rnd rescue next)[0]
         tags = Set.new Array.new (rnd.rand 1..8) { Wool::Tag.new "t" + rnd.hex 1 }
