@@ -8,6 +8,37 @@ macro mserializable
   include JSON::Serializable::Strict
 end
 
+macro mjyd(d, *nn)
+  use_yaml_discriminator "{{d}}", {
+    {% for n in nn %}
+      {{n}}: {{n.stringify.camelcase.id}},
+    {% end %}
+  }
+  use_json_discriminator "{{d}}", {
+    {% for n in nn %}
+      {{n}}: {{n.stringify.camelcase.id}},
+    {% end %}
+  }
+end
+
+macro dc(t, n, a, b)
+  struct {{n.stringify.camelcase.id}} < Command({{t}})
+    mserializable
+
+    getter args : {{a}}
+
+    def_equals_and_hash @action, @args
+
+    def initialize(@args)
+      @action = "{{n}}"
+    end
+
+    def exec(s : T)
+      {{b}}
+    end
+  end
+end
+
 module Wool
   def self.to_tj(v)
     t = v.class.name.rpartition(':').last.underscore

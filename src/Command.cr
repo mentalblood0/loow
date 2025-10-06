@@ -1,39 +1,9 @@
+require "./common.cr"
 require "./Sweater"
 
 module Wool
   abstract struct Command(T)
     mserializable
-
-    macro mjyd(d, *nn)
-      use_yaml_discriminator "{{d}}", {
-        {% for n in nn %}
-          {{n}}: {{n.stringify.camelcase.id}},
-        {% end %}
-      }
-      use_json_discriminator "{{d}}", {
-        {% for n in nn %}
-          {{n}}: {{n.stringify.camelcase.id}},
-        {% end %}
-      }
-    end
-
-    macro dc(t, n, a, b)
-      struct {{n.stringify.camelcase.id}} < Command({{t}})
-        mserializable
-
-        getter args : {{a}}
-
-        def_equals_and_hash @action, @args
-
-        def initialize(@args)
-          @action = "{{n}}"
-        end
-
-        def exec(s : Sweater)
-          {{b}}
-        end
-      end
-    end
 
     getter action : String
 
