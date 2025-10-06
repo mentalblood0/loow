@@ -15,7 +15,7 @@ module Wool
     getter relations_types : Set(Relation::Type)
     getter chest : Trove::Chest
 
-    def add(c : Content)
+    def add(c : Content) : Id
       @chest.transaction do |tx|
         raise Exception.new "Content #{c} already exists" if @chest.has_key! c.id, "type"
 
@@ -34,21 +34,23 @@ module Wool
       c.id
     end
 
-    def delete(id : Id)
+    def delete(id : Id) : Id
       @chest.transaction do |tx|
         ["from", "to"].each do |p|
           tx.where({"thesis.content.value.#{p}" => id.string}) { |ri| tx.delete ri }
         end
         tx.delete id
       end
+      id
     end
 
-    def add(id : Id, tags : Set(Tag))
+    def add(id : Id, tags : Set(Tag)) : UInt32
       @chest.push id, "thesis.tags", tags.map { |t| JSON::Any.new t.name }
     end
 
-    def delete(id : Id, tags : Set(Tag))
+    def delete(id : Id, tags : Set(Tag)) : UInt32
       @chest.transaction { |tx| tags.each { |t| tx.delete! id, "thesis.tags.#{tx.index id, "thesis.tags", t.name}" } }
+      tags.size.to_u32
     end
 
     def get(id : Id) : Thesis?
