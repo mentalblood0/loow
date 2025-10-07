@@ -22,7 +22,7 @@ macro mjyd(d, *nn)
 end
 
 macro dc(t, n, a, b)
-  struct {{n.stringify.camelcase.id}} < Command({{t}})
+  class {{n.stringify.camelcase.id}} < Command({{t}})
     mserializable
 
     getter args : {{a}}

@@ -2,7 +2,7 @@ require "./common.cr"
 require "./Sweater"
 
 module Wool
-  abstract struct Command(T)
+  abstract class Command(T)
     mserializable
 
     getter action : String
